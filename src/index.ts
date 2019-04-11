@@ -237,4 +237,3 @@ function startServerDispatcher(): Dispatcher {
 
   return dispatcher;
 }
-
