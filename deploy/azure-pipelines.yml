@@ -23,9 +23,8 @@ variables:
 
 steps:
   - script: |
-      docker build -t $(DOCKER_LOGIN)/$(taggedImage) -t $(DOCKER_LOGIN)/$(taggedImageLatest) --build-arg BUILD_ID=$(BUILD_ID) .
+      docker build -t $(DOCKER_LOGIN)/$(taggedImage) -t $(DOCKER_LOGIN)/$(taggedImageLatest) --build-arg BUILD_ID=$(BUILD_ID) ./deploy
       docker login -u $(DOCKER_LOGIN) -p $(DOCKER_PASSWORD)
       docker push $(DOCKER_LOGIN)/$(imageName)
-    workingDirectory: deploy
     displayName: 'docker build'
 
