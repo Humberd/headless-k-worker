@@ -151,7 +151,7 @@ export class BattleBridge {
         if (e.body.message === 'SHOOT_LOCKOUT') {
           throw new RateLimitError();
         }
-        if (e.body.message === 'Fight checks failed. LOW_HEALTH') {
+        if (e.body.message === 'Fight checks failed. LOW_HEALTH' || e.body.message === 'LOW_HEALTH') {
           throw new LowHealthError();
         }
 
