@@ -55,11 +55,14 @@ export class BattleFighter {
       }
     } = this.stateService;
 
+
     if (battle.intensityType === IntensityType.EPIC) {
       if (healthBarPrimary < minimalEpicFightPrimaryHp) {
         logger.info(`Not enough HP for epic. Current: ${healthBarPrimary}. Required: ${minimalEpicFightPrimaryHp}`);
         return false;
       }
+
+      return true;
     }
 
     /* We only want to fight when the secondary health bar is full */
