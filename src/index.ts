@@ -6,7 +6,7 @@ import { WorkBridge } from './bridges/work-bridge';
 import { WeeklyChallengeBridge } from './bridges/weekly-challenge-bridge';
 import { RewardCollectorBridge } from './bridges/reward-collector.bridge';
 import { Dispatcher, DispatchJob } from './dispatcher';
-import { sleep, time } from './utils';
+import { NaNError, sleep, time } from './utils';
 import { EattingBridge } from './bridges/eatting-bridge';
 import { StateService } from './state.service';
 import { KeepaliveBridge } from './bridges/keepalive-bridge';
@@ -54,9 +54,9 @@ const attackConfigChooser = new AttackConfigChooser(stateService);
 const travelBridge = new TravelBridge(networkProxy);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
-const serverDispatcher: Dispatcher = startServerDispatcher().init();
-const jobsDispatcher: Dispatcher = getJobsDispatcher()
-    // .init();
+// const serverDispatcher: Dispatcher = startServerDispatcher().init();
+const jobsDispatcher: Dispatcher = getJobsDispatcher().init();
+// .init();
 const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
 
 handleSignals(jobsDispatcher);
@@ -122,7 +122,13 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Work daily',
       timeInterval: time(14, 'minutes'),
       shouldStopRunning: () => {
-        return stateService.workedToday();
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedToday()) {
+          logger.info('Already worked');
+          return true;
+        }
+
+        return false;
       },
       actions: [
         () => workBridge.workDaily(),
@@ -134,7 +140,12 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Work overtime daily',
       timeInterval: time(14, 'minutes'),
       shouldStopRunning: () => {
-        return stateService.workedOvertimeToday();
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedOvertimeToday()) {
+          logger.info('Already worked today');
+          return true;
+        }
+        return false;
       },
       actions: [
         () => workBridge.workOvertimeDaily(),
@@ -148,6 +159,7 @@ function getJobsDispatcher(): Dispatcher {
       shouldStopRunning: () => {
         const logger = getLogger('Work Production checker');
         if (stateService.workedProductionToday()) {
+          logger.info('Already worked today');
           return true;
         }
 
@@ -191,12 +203,12 @@ function getJobsDispatcher(): Dispatcher {
           return true;
         }
 
-        if (!stateService.workedToday() ||
-            !stateService.workedOvertimeToday() ||
-            !stateService.trainedToday()) {
-          logger.info('Not fighting. Some daily tasks has not yet been completed');
-          return true;
-        }
+        // if (!stateService.workedToday() ||
+        //     !stateService.workedOvertimeToday() ||
+        //     !stateService.trainedToday()) {
+        //   logger.info('Not fighting. Some daily tasks has not yet been completed');
+        //   return true;
+        // }
 
         /* Start attacking 4 hours after wc day start */
         if (!stateService.workedProductionToday() &&
@@ -217,6 +229,12 @@ function getJobsDispatcher(): Dispatcher {
   const dispatcher = new Dispatcher('Jobs', jobs);
 
   dispatcher.onError(async (job, error) => {
+    /* Nan errors are unpredictable, because we have no control over them and they can occur when 3rd party data changes */
+    if (error instanceof NaNError) {
+      eventReporter.reportFatalError(job.id, job.name, error);
+      return true;
+    }
+
     eventReporter.reportNormalError(job.id, job.name, error);
     return false;
   });
