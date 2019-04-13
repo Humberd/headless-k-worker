@@ -253,7 +253,7 @@ export class NetworkProxy {
       payload = JSON.parse(text);
     } catch (e) {
       logger.warn(text);
-      throw new JsonParsingError(e);
+      throw new JsonParsingError(text, e);
     }
 
     this.handleJsonErrors(payload);
@@ -351,7 +351,7 @@ export class CsrfError extends Error {
 }
 
 export class JsonParsingError extends Error {
-  constructor(error: any) {
+  constructor(public body: string, error: any) {
     super(`JSON parsing error: ${error}`);
   }
 }
@@ -390,6 +390,13 @@ export class ElementNotFoundError extends Error {
   constructor(selector: string) {
     super(`Element (${selector}) cannot be found`);
   }
+}
+
+export class BattleEndedError extends Error {
+  constructor(error: any) {
+    super(`Battle Ended Error: ${error}`)
+  }
+
 }
 
 export class NoRestPointsError extends Error {

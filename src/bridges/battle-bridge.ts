@@ -1,4 +1,11 @@
-import { LowHealthError, NetworkProxy, RateLimitError, UnknownError } from '../network-proxy';
+import {
+  BattleEndedError,
+  JsonParsingError,
+  LowHealthError,
+  NetworkProxy,
+  RateLimitError,
+  UnknownError
+} from '../network-proxy';
 import { StateService } from '../state.service';
 import { AttackResponse } from '../types/attack-response';
 import { EattingBridge } from './eatting-bridge';
@@ -156,6 +163,12 @@ export class BattleBridge {
         }
 
         // todo: handleBattleEnd
+      }
+
+      if (e instanceof JsonParsingError) {
+        if (e.body === 'Zone is not meant for aircraft') {
+          throw new BattleEndedError(e);
+        }
       }
 
       throw e;
