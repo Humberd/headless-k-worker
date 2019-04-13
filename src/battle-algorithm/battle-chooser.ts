@@ -20,7 +20,12 @@ export class BattleChooser {
 
     const theBestBattle = battles[max.index];
 
-    logger.debug(`The best battle with score ${max.value} is: ${JSON.stringify({...theBestBattle})}`);
+    if (Object.entries(theBestBattle).length === 0) {
+      logger.debug('battles', JSON.stringify(battles));
+      logger.debug('scores:', scores);
+      logger.debug('max:', max);
+    }
+    logger.debug(`The best battle with score ${max.value} is: ${JSON.stringify(theBestBattle)}`);
 
     return theBestBattle;
   }
