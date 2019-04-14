@@ -27,7 +27,7 @@ require('dotenv').config();
 log4js.configure({
   appenders: {
     console: {type: 'stdout'},
-    file: {type: 'file', filename: 'logs/index.log'}
+    file: {type: 'dateFile', filename: 'logs/index.log', pattern: '.yyyy-MM-dd', compress: true}
   },
   categories: {
     default: {
@@ -54,9 +54,9 @@ const attackConfigChooser = new AttackConfigChooser(stateService);
 const travelBridge = new TravelBridge(networkProxy);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
-const serverDispatcher: Dispatcher = startServerDispatcher().init();
-const jobsDispatcher: Dispatcher = getJobsDispatcher();
-// .init();
+// const serverDispatcher: Dispatcher = startServerDispatcher().init();
+const jobsDispatcher: Dispatcher = getJobsDispatcher()
+    .init();
 const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
 
 handleSignals(jobsDispatcher);
