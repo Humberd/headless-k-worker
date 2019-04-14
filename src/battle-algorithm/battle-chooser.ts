@@ -20,7 +20,7 @@ export class BattleChooser {
 
     const theBestBattle = battles[max.index];
 
-    if (Object.entries(theBestBattle).length === 0) {
+    if (Object.entries(theBestBattle).length === 0 || !theBestBattle) {
       logger.debug('battles', JSON.stringify(battles));
       logger.debug('scores:', scores);
       logger.debug('max:', max);
