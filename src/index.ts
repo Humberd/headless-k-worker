@@ -168,7 +168,8 @@ function getJobsDispatcher(): Dispatcher {
         if (stateService.isWcStartDay() &&
             !stateService.dayTimeElapsed(time(6, 'hours'))) {
           logger.info('Not working. Must elapse at least 6 hours in wc start day.');
-          return true;
+          // return true;
+          return false;
         }
 
         return false;

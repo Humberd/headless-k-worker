@@ -57,7 +57,6 @@ export async function noExceptionExecutor(tasks: (() => Promise<any>)[]): Promis
 
 
 /**
- *
  * @returns value in ms
  */
 export function time(value: number, unit: 'seconds' | 'minutes' | 'hours' | 'days'): number {
