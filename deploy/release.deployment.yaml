@@ -22,6 +22,10 @@ spec:
           env:
             - name: ERPK_RM
               value: $(ERPK_RM)
+            - name: SERVER_URL
+              value: 'https://$(SERVER_DOMAIN)'
+            - name: SERVER_TOKEN
+              value: $(WORKER_TOKEN)
             # This is so that k8s refetches latest image
             - name: RELEASE_ID
               value: '$(Release.DeploymentId)'

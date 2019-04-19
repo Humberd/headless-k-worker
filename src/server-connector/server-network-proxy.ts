@@ -18,8 +18,6 @@ export class ServerNetworkProxy {
 
     const body = await resp.json();
 
-    console.log(body);
-
     if (!resp.ok) {
       if (resp.status === 403) {
         throw new InvalidTokenError(resp.url, body);

@@ -54,7 +54,8 @@ const attackConfigChooser = new AttackConfigChooser(stateService);
 const travelBridge = new TravelBridge(networkProxy);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
-// const serverDispatcher: Dispatcher = startServerDispatcher().init();
+const serverDispatcher: Dispatcher = startServerDispatcher()
+    .init();
 const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
 const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
