@@ -29,3 +29,10 @@ spec:
             # This is so that k8s refetches latest image
             - name: RELEASE_ID
               value: '$(Release.DeploymentId)'
+          volumeMounts:
+            - mountPath: /usr/app/src/logs
+              name: worker-logs
+      volumes:
+        - name: worker-logs
+          persistentVolumeClaim:
+            claimName: worker-volume-claim
