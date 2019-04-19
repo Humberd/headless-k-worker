@@ -60,7 +60,7 @@ const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
 const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
 
-handleSignals(jobsDispatcher);
+handleSignals([jobsDispatcher, serverDispatcher]);
 
 function getJobsDispatcher(): Dispatcher {
   const jobs: DispatchJob[] = [

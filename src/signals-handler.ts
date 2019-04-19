@@ -4,13 +4,13 @@ import Signals = NodeJS.Signals;
 
 const logger = getLogger('Signal handler');
 
-export function handleSignals(dispatcher: Dispatcher) {
+export function handleSignals(dispatchers: Dispatcher[]) {
   process.on('SIGTERM', stopProcessGracefully);
   process.on('SIGINT', stopProcessGracefully);
 
   function stopProcessGracefully(signal: Signals) {
     logger.info(`Received ${signal}`);
-    dispatcher.shutdown();
+    dispatchers.forEach(it => it.shutdown())
     // process.exit(0);
   }
 }
