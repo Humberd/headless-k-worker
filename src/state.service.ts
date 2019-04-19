@@ -10,7 +10,7 @@ export class StateService {
   @log() version: string = process.env.BUILD_ID;
   @log() status: AppStatus = AppStatus.OK;
   @log() serverUrl: string = process.env.SERVER_URL;
-  @log({secure: false}) serverToken: string = process.env.SERVER_TOKEN;
+  @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
 
   @log() erpk: string;
   @log({secure: true}) erpk_rm: string = process.env.ERPK_RM; //remember_me token
