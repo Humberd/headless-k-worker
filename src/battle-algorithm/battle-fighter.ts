@@ -88,6 +88,8 @@ export class BattleFighter {
       await this.travelBridge.travel(config.battleId, config.sideId);
     }
 
+    await this.battleBridge.changeWeapon(config.battleId, config.battleType);
+
     try {
       return await this.battleBridge.startAttacking(config);
     } finally {

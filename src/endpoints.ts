@@ -24,6 +24,8 @@ import { AttackRequest } from './types/attack-request';
 import { TravelRequest } from './types/travel-request';
 import { TravelResponse } from './types/travel-response';
 import { URLSearchParams } from 'url';
+import { ChangeWeaponRequest } from './types/change-weapon-request';
+import { ChangeWeaponResponse } from './types/change-weapon-response';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -213,6 +215,14 @@ export async function collectDailyOrderReward(erpk: string, formData: DailyRewar
 
 export async function travel(erpk: string, formData: TravelRequest) {
   return request<TravelResponse>(`https://www.erepublik.com/en/main/travel/`, {
+    body: formData,
+    method: 'POST',
+    erpk: erpk
+  })
+}
+
+export async function changeWeapon(erpk: string, formData: ChangeWeaponRequest) {
+  return request<ChangeWeaponResponse>(`https://www.erepublik.com/en/military/change-weapon`, {
     body: formData,
     method: 'POST',
     erpk: erpk

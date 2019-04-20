@@ -1,5 +1,6 @@
 import { BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
+import { WeaponType } from './types/change-weapon-request';
 
 export enum AppStatus {
   OK = 'OK',
@@ -35,12 +36,18 @@ export class StateService {
   @log() lastGoldBuyDay: number;
 
   @log() userConfig = {
-    battleTypePriority: BattleType.AIR,
+    battleTypePriority: BattleType.TANK, // todo: change after event
+    tankPrimaryWeapon: WeaponType.BAZOOKA, // todo: change after event
+    tankSecondaryWeapon: WeaponType.Q7, // todo: change after event
+    airPrimaryWeapon: WeaponType.NO_WEAPON,
+    airSecondaryWeapon: WeaponType.NO_WEAPON,
+
     nationalityPriority: Nationality.POLAND,
-    maxKillsIn1Go: 103,
+
+    maxKillsIn1Go: 165, // todo: change after event
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 200,
-    minimalNormalFightSecondaryHpPercent: 0.9,
+    minimalNormalFightSecondaryHpPercent: 0,
     enableFighting: true
   };
 

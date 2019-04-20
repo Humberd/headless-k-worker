@@ -2,6 +2,7 @@ import {
   attackAir,
   attackTank,
   buyGold,
+  changeWeapon,
   chooseBattleSide,
   collectDailyOrderReward,
   collectDailyTaskReward,
@@ -28,6 +29,7 @@ import { JSDOM } from 'jsdom';
 import { StateService } from './state.service';
 import { TravelRequest } from './types/travel-request';
 import { getLogger } from 'log4js';
+import { ChangeWeaponRequest } from './types/change-weapon-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -238,6 +240,20 @@ export class NetworkProxy {
     }));
   }
 
+  async changeWeapon(formData: ChangeWeaponRequest) {
+    const response = await this.jsonResponseHandler(changeWeapon(this.erpk, {
+      ...formData,
+      _token: this._token
+    }));
+
+    /* Double equals not triple. DO NOT CHANGE */
+    if (response.weaponId != formData.customizationLevel) {
+      throw new WeaponNotChangedError(formData)
+    }
+
+    return response;
+  }
+
 
   /* ------------------------------------------------------------- */
   private async jsonResponseHandler<T>(response: Promise<TypedResponse<T>>) {
@@ -396,11 +412,10 @@ export class BattleEndedError extends Error {
   constructor(error: any) {
     super(`Battle Ended Error: ${error}`)
   }
-
 }
 
-export class NoRestPointsError extends Error {
-  constructor(public body: any) {
-    super('No rest points Error ' + JSON.stringify(body));
+export class WeaponNotChangedError extends Error {
+  constructor(data: any) {
+    super(`Weapon not changed ${JSON.stringify(data)}`)
   }
 }

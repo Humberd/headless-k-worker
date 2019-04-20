@@ -4,7 +4,8 @@ import {
   LowHealthError,
   NetworkProxy,
   RateLimitError,
-  UnknownError
+  UnknownError,
+  WeaponNotChangedError
 } from '../network-proxy';
 import { StateService } from '../state.service';
 import { AttackResponse } from '../types/attack-response';
@@ -13,6 +14,7 @@ import { Battle } from '../types/campains-response';
 import { BattleType } from '../battle-algorithm/battle-analyzer-enums';
 import { phase, sleep } from '../utils';
 import { getLogger } from 'log4js';
+import { WeaponType } from '../types/change-weapon-request';
 
 export interface AttackConfig {
   battleId: string;
@@ -54,6 +56,35 @@ export class BattleBridge {
       logger.info('Already collected');
     }
     return response;
+  }
+
+  @phase('Change Weapon')
+  async changeWeapon(battleId: string, battleType: BattleType) {
+    let primaryWeapon: WeaponType;
+    let secondaryWeapon: WeaponType;
+
+    if (battleType === BattleType.TANK) {
+      primaryWeapon = this.stateService.userConfig.tankPrimaryWeapon;
+      secondaryWeapon = this.stateService.userConfig.tankSecondaryWeapon;
+    } else {
+      primaryWeapon = this.stateService.userConfig.airPrimaryWeapon;
+      secondaryWeapon = this.stateService.userConfig.airSecondaryWeapon;
+    }
+
+    try {
+      return await this.networkProxy.changeWeapon({
+        battleId: battleId,
+        customizationLevel: primaryWeapon
+      });
+    } catch (e) {
+      if (e instanceof WeaponNotChangedError) {
+        return await this.networkProxy.changeWeapon({
+          battleId: battleId,
+          customizationLevel: secondaryWeapon
+        });
+      }
+    }
+
   }
 
   @phase('attacking')

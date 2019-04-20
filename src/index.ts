@@ -55,7 +55,7 @@ const travelBridge = new TravelBridge(networkProxy);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
 const serverDispatcher: Dispatcher = startServerDispatcher()
-    .init();
+    // .init();
 const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
 const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
@@ -73,9 +73,6 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       },
       actions: [
-        // () => {
-        //   throw new Error('test error just in case');
-        // },
         () => keepaliveBridge.refreshTokens(),
         () => sleep(1000)
       ]
