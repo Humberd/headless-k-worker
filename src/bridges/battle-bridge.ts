@@ -41,7 +41,7 @@ export class BattleBridge {
     return Object.values(response.battles);
   }
 
-  @phase('choose battle side')
+  @phase('Choose battle side')
   async chooseBattleSide(battleId: string, sideId: string) {
     return await this.networkProxy.chooseBattleSide(battleId, sideId);
   }
@@ -87,7 +87,12 @@ export class BattleBridge {
 
   }
 
-  @phase('attacking')
+  @phase('Get battle stats')
+  async getBattleStats(battleId: string) {
+    return this.networkProxy.getBattleStats(battleId);
+  }
+
+  @phase('Attacking')
   async startAttacking({battleId, sideId, killsLimit, battleType}: AttackConfig) {
     return new Promise((resolve, reject) => {
       let rateLimitTimeMs = this.RATE_LIMIT_MS;

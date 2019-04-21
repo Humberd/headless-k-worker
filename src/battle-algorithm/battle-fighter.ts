@@ -25,20 +25,20 @@ export class BattleFighter {
   }
 
   async tryFight() {
+    if (!this.stateService.userConfig.enableFighting) {
+      logger.info('Fighting has not been enabled.');
+      return;
+    }
+
     const battles = await this.battleBridge.getBattles();
     const analyzedBattles = this.battleAnalyzer.analyzeBattles(battles);
-    const bestBattle = this.battleChooser.chooseBestBattle(analyzedBattles);
+    const bestBattle = await this.battleChooser.chooseBestBattle(analyzedBattles);
     const attackConfig = this.attackConfigChooser.calculateAttackConfig(bestBattle);
 
     logger.debug(attackConfig);
 
     if (!this.shouldFight(attackConfig, bestBattle)) {
       logger.info('~~ Not fighting ~~');
-      return;
-    }
-
-    if (!this.stateService.userConfig.enableFighting) {
-      logger.info('Fighting has not been enabled.');
       return;
     }
 

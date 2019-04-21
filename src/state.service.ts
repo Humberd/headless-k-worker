@@ -1,6 +1,7 @@
 import { BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
 import { WeaponType } from './types/change-weapon-request';
+import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
 
 export enum AppStatus {
   OK = 'OK',
@@ -42,12 +43,14 @@ export class StateService {
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
 
+    equalRankDecision: BattleEqualRankDecision.LOWEST_KILL_EITHER_SIDE,
+
     nationalityPriority: Nationality.POLAND,
 
     maxKillsIn1Go: 165, // todo: change after event
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 200,
-    minimalNormalFightSecondaryHpPercent: 0,
+    minimalNormalFightSecondaryHpPercent: 0.9,
     enableFighting: true
   };
 
@@ -63,7 +66,7 @@ export class StateService {
     return this.lastWorkDay === this.currentDay;
   }
 
-  workedOvertimeToday(): boolean {
+  workedOvertimeToday():  boolean {
     return this.lastWorkOvertimeDay === this.currentDay;
   }
 

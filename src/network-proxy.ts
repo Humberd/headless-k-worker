@@ -8,6 +8,7 @@ import {
   collectDailyTaskReward,
   collectWeeklyChallengeReward,
   eat,
+  getBattleStats,
   getCampaignsList,
   getCompaniesPage,
   getMarketExchange,
@@ -252,6 +253,10 @@ export class NetworkProxy {
     }
 
     return response;
+  }
+
+  async getBattleStats(battleId: string) {
+    return await this.jsonResponseHandler(getBattleStats(this.erpk, battleId));
   }
 
 

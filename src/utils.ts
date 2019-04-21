@@ -16,20 +16,6 @@ export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function findMax(values: number[]): {index: number, value: number} {
-  let max = 0;
-  for (const value of values) {
-    if (value > max) {
-      max = value;
-    }
-  }
-
-  return {
-    value: max,
-    index: values.indexOf(max)
-  };
-}
-
 export function handleErrorMessage(error: Error, desiredMessage: string, action: () => any) {
   if (error instanceof UnknownError) {
     if (error.body.message === desiredMessage) {

@@ -1,0 +1,4 @@
+export enum BattleEqualRankDecision {
+  THE_FIRST_ONE = 'THE_FIRST_ONE',
+  LOWEST_KILL_EITHER_SIDE = 'LOWEST_KILL_EITHER_SIDE',
+}

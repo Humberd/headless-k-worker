@@ -89,8 +89,11 @@ export async function getInventory() {
   return request<InventoryResponse>(`https://www.erepublik.com/en/economy/inventory-items/`);
 }
 
-export async function getBattleStats(battleId: string) {
-  return request<BattleStatsResponse>(`https://www.erepublik.com/en/military/nbp-stats/${battleId}/4`);
+export async function getBattleStats(erpk: string, battleId: string) {
+  return request<BattleStatsResponse>(`https://www.erepublik.com/en/military/nbp-stats/${battleId}/4`, {
+    method: 'GET',
+    erpk: erpk
+  });
 }
 
 export async function attackTank(erpk: string, formData: AttackRequest) {
