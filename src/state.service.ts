@@ -37,7 +37,7 @@ export class StateService {
   @log() userConfig = {
     battleTypePriority: BattleType.AIR,
     nationalityPriority: Nationality.POLAND,
-    maxKillsIn1Go: 103,
+    maxKillsIn1Go: 25,
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 200,
     minimalNormalFightSecondaryHpPercent: 0.9,
