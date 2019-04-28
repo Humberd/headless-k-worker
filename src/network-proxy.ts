@@ -11,6 +11,7 @@ import {
   getBattleStats,
   getCampaignsList,
   getCompaniesPage,
+  getEnergyData,
   getMarketExchange,
   getProfile,
   getUserData,
@@ -258,6 +259,10 @@ export class NetworkProxy {
 
   async getUserData() {
     return await this.jsonResponseHandler(getUserData(this.erpk))
+  }
+
+  async getEnergyData() {
+    return await this.jsonResponseHandler(getEnergyData(this.erpk))
   }
 
 

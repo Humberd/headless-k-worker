@@ -27,6 +27,7 @@ import { URLSearchParams } from 'url';
 import { ChangeWeaponRequest } from './types/change-weapon-request';
 import { ChangeWeaponResponse } from './types/change-weapon-response';
 import { UserDataResponse } from './types/user-data-response';
+import { EnergyDataResponse } from './types/energy-data-response';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -235,6 +236,13 @@ export async function changeWeapon(erpk: string, formData: ChangeWeaponRequest) 
 
 export async function getUserData(erpk: string) {
   return request<UserDataResponse>('https://www.erepublik.com/en/main/mobile-get-user-data', {
+    method: 'GET',
+    erpk: erpk
+  })
+}
+
+export async function getEnergyData(erpk: string) {
+  return request<EnergyDataResponse>('https://www.erepublik.com/en/main/mobile-energy-data', {
     method: 'GET',
     erpk: erpk
   })
