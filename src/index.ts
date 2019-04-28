@@ -17,7 +17,6 @@ import { AttackConfigChooser } from './battle-algorithm/attack-config-chooser';
 import { BattleFighter } from './battle-algorithm/battle-fighter';
 import { TravelBridge } from './bridges/travel-bridge';
 import * as log4js from 'log4js';
-import { getLogger } from 'log4js';
 import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
@@ -86,10 +85,10 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       },
       actions: [
-        () => profileBridge.refreshProfileInformation()
+        () => profileBridge.refreshUserData()
       ]
     },
-    {
+/*    {
       id: 'wc-refresher',
       name: 'Weekly challenge refresher',
       timeInterval: time(14, 'minutes'),
@@ -161,8 +160,8 @@ function getJobsDispatcher(): Dispatcher {
           return true;
         }
 
-        /* We are not running production, because it uses too much hp, which we will use on fighting in epics.
-        * Try work production 6 hours after day start */
+        /!* We are not running production, because it uses too much hp, which we will use on fighting in epics.
+        * Try work production 6 hours after day start *!/
         if (stateService.isWcStartDay() &&
             !stateService.dayTimeElapsed(time(6, 'hours'))) {
           logger.info('Not working. Must elapse at least 6 hours in wc start day.');
@@ -209,7 +208,7 @@ function getJobsDispatcher(): Dispatcher {
         //   return true;
         // }
 
-        /* Start attacking 4 hours after wc day start */
+        /!* Start attacking 4 hours after wc day start *!/
         if (!stateService.workedProductionToday() &&
             stateService.isWcStartDay() &&
             !stateService.dayTimeElapsed(time(4, 'hours'))) {
@@ -222,7 +221,7 @@ function getJobsDispatcher(): Dispatcher {
       actions: [
         () => battleFighter.tryFight()
       ]
-    }
+    }*/
   ];
 
   const dispatcher = new Dispatcher('Jobs', jobs);

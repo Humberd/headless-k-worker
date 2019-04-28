@@ -10,6 +10,23 @@ export class ProfileBridge {
 
   @phase('Refresh Profile Information')
   async refreshProfileInformation() {
-    return await this.networkProxy.getProfile(this.stateService.userId);
+    const response = await this.networkProxy.getProfile(this.stateService.userId);
+
+    this.stateService.currentCountryLocationId = response.location.residenceCountry.id;
+
+    return response;
+  }
+
+  @phase('Refresh User Data')
+  async refreshUserData() {
+    const response = await this.networkProxy.getUserData();
+
+    this.stateService._token = response.csrf;
+    this.stateService.userId = String(response.id);
+    this.stateService.healthBarLimit = response.energyPool;
+    this.stateService.division = response.division;
+    this.stateService.currentCountryLocationId = response.citizenshipCountryId;
+
+    return response
   }
 }

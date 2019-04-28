@@ -13,6 +13,7 @@ import {
   getCompaniesPage,
   getMarketExchange,
   getProfile,
+  getUserData,
   getWeeklyChallengeData,
   login,
   train,
@@ -220,11 +221,7 @@ export class NetworkProxy {
   }
 
   async getProfile(userId: string) {
-    const response = await this.jsonResponseHandler(getProfile(this.erpk, userId));
-
-    this.stateService.currentCountryLocationId = response.location.residenceCountry.id;
-
-    return response;
+    return await this.jsonResponseHandler(getProfile(this.erpk, userId));
   }
 
   async collectDailyOrderReward() {
@@ -257,6 +254,10 @@ export class NetworkProxy {
 
   async getBattleStats(battleId: string) {
     return await this.jsonResponseHandler(getBattleStats(this.erpk, battleId));
+  }
+
+  async getUserData() {
+    return await this.jsonResponseHandler(getUserData(this.erpk))
   }
 
 

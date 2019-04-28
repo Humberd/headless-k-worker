@@ -25,6 +25,7 @@ export class StateService {
 
   @log() userId: string;
   @log() currentCountryLocationId: Nationality;
+  @log() division: number;
 
   @log() currentDay: number;
   @log() weeklyChallengeTimeLeftMs: number; // in milliseconds
