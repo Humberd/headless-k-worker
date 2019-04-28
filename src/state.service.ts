@@ -38,12 +38,12 @@ export class StateService {
 
   @log() userConfig = {
     battleTypePriority: BattleType.TANK, // todo: change after event
-    tankPrimaryWeapon: WeaponType.BAZOOKA, // todo: change after event
+    tankPrimaryWeapon: WeaponType.Q7, // todo: change after event
     tankSecondaryWeapon: WeaponType.Q7, // todo: change after event
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
 
-    equalRankDecision: BattleEqualRankDecision.LOWEST_KILL_EITHER_SIDE,
+    equalRankDecision: BattleEqualRankDecision.THE_FIRST_ONE,
 
     nationalityPriority: Nationality.POLAND,
 

@@ -66,8 +66,6 @@ export class BattleChooser {
 
   private async decideEqualRank(battles: DetailedBattleAnalysis[], battleType: BattleType): Promise<DetailedBattleAnalysis> {
     const decision = this.stateService.userConfig.equalRankDecision;
-    // fixme: add a proper division
-    const currentDivision = battleType === BattleType.TANK ? '4' : '11';
 
     if (battles.length === 1) {
       return battles[0];
@@ -76,25 +74,6 @@ export class BattleChooser {
     switch (decision) {
       case BattleEqualRankDecision.THE_FIRST_ONE: {
         return battles[0];
-      }
-      case BattleEqualRankDecision.LOWEST_KILL_EITHER_SIDE: {
-        const detailedBattles = await this.populateBattlesWithDetails(battles);
-
-        const highestKillCount = {
-          value: 0,
-
-        };
-
-        detailedBattles.forEach(battle => {
-          const currentStats = battle.detailedStats.stats.current;
-          const currentBattle = Object.keys(currentStats)[0];
-          const divisionSides = currentStats[currentBattle][currentDivision];
-          battle.nationalities.forEach(nationality => {
-            divisionSides[nationality].top_kills.forEach(topPlayer => {
-
-            })
-          })
-        });
       }
       default: {
         throw new NotImplementedError(`${decision} has not been implemented`);
