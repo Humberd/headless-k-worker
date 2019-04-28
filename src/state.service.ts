@@ -15,6 +15,8 @@ export class StateService {
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
 
   @log() erpk: string;
+  @log({secure: true}) email: string = process.env.EMAIL;
+  @log({secure: true}) password: string = process.env.PASSWORD;
   @log({secure: true}) erpk_rm: string = process.env.ERPK_RM; //remember_me token
   @log() _token: string;
 
