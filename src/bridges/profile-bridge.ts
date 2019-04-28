@@ -28,5 +28,6 @@ export class ProfileBridge {
     this.stateService.currentCountryLocationId = response.citizenshipCountryId;
 
     return response
+
   }
 }
