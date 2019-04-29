@@ -20,7 +20,8 @@ export class TokenHunterJob implements DispatchJob {
   shouldStopRunning: () => boolean = () => false;
   timeInterval: number = 1_000_000;
 
-  private readonly KILLS = 2;
+  private readonly KILLS = 8;
+  private readonly DIVISION = 1;
 
   constructor(private battleBridge: BattleBridge,
               private stateService: StateService,
@@ -34,9 +35,15 @@ export class TokenHunterJob implements DispatchJob {
     const tankBattles = battles.filter(it => it.type === Type.Tanks);
     const countriesMap = this.battlesToMap(tankBattles);
 
-    const polandBattles = countriesMap.get(String(Nationality.TURKEY));
-    const polandBattlesDetails = await Promise.all(polandBattles.map(async (it) => {
-      const response = await this.battleBridge.getBattleStats(it.battleId);
+    for (const [key, value] of countriesMap.entries()) {
+      await this.fightForCountry(value)
+    }
+    // await this.fightForCountry(countriesMap.get(String(Nationality.NIGERIA)))
+  }
+
+  private async fightForCountry(battles: TokenHunterBattle[]) {
+    const polandBattlesDetails = await Promise.all(battles.map(async (it) => {
+      const response = await this.battleBridge.getBattleStats(it.battleId, this.DIVISION);
       return {
         ...it,
         // battle: null,
@@ -62,11 +69,19 @@ export class TokenHunterJob implements DispatchJob {
         killsLimit: this.KILLS,
         requiresTravel: this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId),
         skipTravelBack: true,
+        divisionSwitch: this.DIVISION,
+        battleNumber: this.getBattleNumber(bat.details)
       };
       logger.info(attackConfig);
 
-      await this.battleFighter.fight(attackConfig);
-      await sleep(2000);
+      try {
+        await this.battleFighter.fight(attackConfig);
+        await sleep(2000);
+      } catch (e) {
+        logger.error({...bat, details: null});
+        logger.error('Fight error', e)
+      }
+
     }
   }
 
@@ -91,6 +106,10 @@ export class TokenHunterJob implements DispatchJob {
   private getTopKills(battle: BattleStatsResponse, nationality: Nationality) {
     const battleNumber: string = Object.keys(battle.stats.current)[0];
     return battle.stats.current[battleNumber][this.stateService.division as 4][nationality].top_kills;
+  }
+
+  private getBattleNumber(battle: BattleStatsResponse): number {
+    return Number(Object.keys(battle.stats.current)[0]);
   }
 
   private isBattleFinished(battle: BattleStatsResponse): boolean {

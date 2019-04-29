@@ -30,6 +30,7 @@ import { UserDataResponse } from './types/user-data-response';
 import { EnergyDataResponse } from './types/energy-data-response';
 import { LoginCredentialsRequest } from './types/login-credentials-request';
 import { LoginTokenRequest } from './types/login-token-request';
+import { SwitchDivisionRequest } from './types/switch-division-request';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -93,8 +94,8 @@ export async function getInventory() {
   return request<InventoryResponse>(`https://www.erepublik.com/en/economy/inventory-items/`);
 }
 
-export async function getBattleStats(erpk: string, battleId: string) {
-  return request<BattleStatsResponse>(`https://www.erepublik.com/en/military/nbp-stats/${battleId}/4`, {
+export async function getBattleStats(erpk: string, battleId: string, division: number) {
+  return request<BattleStatsResponse>(`https://www.erepublik.com/en/military/nbp-stats/${battleId}/${division}`, {
     method: 'GET',
     erpk: erpk
   });
@@ -261,6 +262,14 @@ export async function loginTokenMobile(formData: LoginTokenRequest) {
   return request<UserDataResponse>(`https://www.erepublik.com/en/main/mobile-login`,{
     method: 'POST',
     body: formData
+  })
+}
+
+export async function switchDivision(erpk: string, formData: SwitchDivisionRequest) {
+  return request(`https://www.erepublik.com/en/main/switch-division`, {
+    method: 'POST',
+    body: formData,
+    erpk: erpk
   })
 }
 

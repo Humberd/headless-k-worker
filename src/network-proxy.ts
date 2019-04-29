@@ -19,6 +19,7 @@ import {
   login,
   loginCredentialsMobile,
   loginTokenMobile,
+  switchDivision,
   train,
   travel,
   TypedResponse,
@@ -37,6 +38,7 @@ import { getLogger } from 'log4js';
 import { ChangeWeaponRequest } from './types/change-weapon-request';
 import { LoginCredentialsRequest } from './types/login-credentials-request';
 import { LoginTokenRequest } from './types/login-token-request';
+import { SwitchDivisionRequest } from './types/switch-division-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -261,8 +263,8 @@ export class NetworkProxy {
     return response;
   }
 
-  async getBattleStats(battleId: string) {
-    return await this.jsonResponseHandler(getBattleStats(this.erpk, battleId));
+  async getBattleStats(battleId: string, division: number) {
+    return await this.jsonResponseHandler(getBattleStats(this.erpk, battleId, division));
   }
 
   async getUserData() {
@@ -296,6 +298,13 @@ export class NetworkProxy {
     this.extractErpk(response.headers);
 
     return body;
+  }
+
+  async switchDivision(formData: SwitchDivisionRequest) {
+    return this.jsonResponseHandler(switchDivision(this.erpk, {
+      ...formData,
+      _token: this._token
+    }));
   }
 
 

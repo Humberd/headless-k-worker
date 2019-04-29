@@ -23,6 +23,8 @@ export interface AttackConfig {
   battleType: BattleType;
   requiresTravel: boolean;
   skipTravelBack?: boolean;
+  divisionSwitch?: number;
+  battleNumber?: number;
 }
 
 const logger = getLogger('BattleBridge');
@@ -40,6 +42,19 @@ export class BattleBridge {
     const response = await this.networkProxy.getCampainsList();
 
     return Object.values(response.battles);
+  }
+
+  @phase('Division switch')
+  async switchDivision(battleId: string, countryId: string, battleNumber: number, division: number) {
+    const response = await this.networkProxy.switchDivision({
+      battleId: battleId,
+      action: 'activate',
+      countryId: countryId,
+      division: division,
+      zoneId: battleNumber
+    });
+
+    return response;
   }
 
   @phase('Choose battle side')
@@ -89,8 +104,8 @@ export class BattleBridge {
   }
 
   @phase('Get battle stats')
-  async getBattleStats(battleId: string) {
-    return this.networkProxy.getBattleStats(battleId);
+  async getBattleStats(battleId: string, division = 4) {
+    return this.networkProxy.getBattleStats(battleId, division);
   }
 
   @phase('Attacking')

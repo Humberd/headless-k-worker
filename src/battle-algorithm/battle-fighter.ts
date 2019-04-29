@@ -90,6 +90,10 @@ export class BattleFighter {
 
     await this.battleBridge.changeWeapon(config.battleId, config.battleType);
 
+    if (config.divisionSwitch) {
+      await this.battleBridge.switchDivision(config.battleId, config.sideId, config.battleNumber, config.divisionSwitch)
+    }
+
     try {
       return await this.battleBridge.startAttacking(config);
     } finally {
