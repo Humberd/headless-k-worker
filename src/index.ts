@@ -19,6 +19,7 @@ import * as log4js from 'log4js';
 import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
+import { TokenHunterJob } from './token-hunter-job';
 
 require('dotenv').config();
 
@@ -101,6 +102,7 @@ function getJobsDispatcher(): Dispatcher {
         () => sleep(2000)
       ]
     },
+    new TokenHunterJob(battleBridge)
     // {
     //   id: 'work-daily',
     //   name: 'Work daily',
