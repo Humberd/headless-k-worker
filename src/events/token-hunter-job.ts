@@ -7,6 +7,7 @@ import { BattleType, Nationality } from '../battle-algorithm/battle-analyzer-enu
 import { getLogger } from 'log4js';
 import { BattleAnalyzer } from '../battle-algorithm/battle-analyzer';
 import { BattleFighter } from '../battle-algorithm/battle-fighter';
+import { sleep } from '../utils';
 
 const logger = getLogger('TokenHunterJob');
 
@@ -33,7 +34,7 @@ export class TokenHunterJob implements DispatchJob {
     const tankBattles = battles.filter(it => it.type === Type.Tanks);
     const countriesMap = this.battlesToMap(tankBattles);
 
-    const polandBattles = countriesMap.get('35');
+    const polandBattles = countriesMap.get(String(Nationality.TURKEY));
     const polandBattlesDetails = await Promise.all(polandBattles.map(async (it) => {
       const response = await this.battleBridge.getBattleStats(it.battleId);
       return {
@@ -59,11 +60,13 @@ export class TokenHunterJob implements DispatchJob {
         battleId: bat.battleId,
         sideId: bat.sideId,
         killsLimit: this.KILLS,
-        requiresTravel:  this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId)
+        requiresTravel: this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId),
+        skipTravelBack: true,
       };
       logger.info(attackConfig);
 
-      await this.battleFighter.fight(attackConfig)
+      await this.battleFighter.fight(attackConfig);
+      await sleep(2000);
     }
   }
 
