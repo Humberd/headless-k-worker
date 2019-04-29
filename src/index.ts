@@ -102,7 +102,7 @@ function getJobsDispatcher(): Dispatcher {
         () => sleep(2000)
       ]
     },
-    new TokenHunterJob(battleBridge)
+    new TokenHunterJob(battleBridge, stateService)
     // {
     //   id: 'work-daily',
     //   name: 'Work daily',
