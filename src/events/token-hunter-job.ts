@@ -1,9 +1,12 @@
-import { DispatchJob } from './dispatcher';
-import { BattleBridge } from './bridges/battle-bridge';
-import { Battle, Type } from './types/campains-response';
-import { StateService } from './state.service';
-import { BattleStatsResponse } from './types/battle-stats-response';
-import { Nationality } from './battle-algorithm/battle-analyzer-enums';
+import { DispatchJob } from '../dispatcher';
+import { BattleBridge } from '../bridges/battle-bridge';
+import { Battle, Type } from '../types/campains-response';
+import { StateService } from '../state.service';
+import { BattleStatsResponse } from '../types/battle-stats-response';
+import { Nationality } from '../battle-algorithm/battle-analyzer-enums';
+import { getLogger } from 'log4js';
+
+const logger = getLogger('TokenHunterJob');
 
 export class TokenHunterJob implements DispatchJob {
   actions: Array<() => Promise<any>> = [
@@ -14,7 +17,7 @@ export class TokenHunterJob implements DispatchJob {
   shouldStopRunning: () => boolean = () => false;
   timeInterval: number = 1_000_000;
 
-  private readonly KILLS = 5;
+  private readonly KILLS = 10;
 
   constructor(private battleBridge: BattleBridge,
               private stateService: StateService) {
@@ -31,16 +34,22 @@ export class TokenHunterJob implements DispatchJob {
       const response = await this.battleBridge.getBattleStats(it.battleId);
       return {
         ...it,
-        battle: null,
-        // details: response,
+        // battle: null,
+        details: response,
         topKills: this.getTopKillsRange(response, Number(it.sideId)),
         finished: this.isBattleFinished(response),
         alreadyFought: this.alreadyFought(response, Number(it.sideId))
       };
     }));
 
-    console.log(polandBattlesDetails);
+    const filteredPolandBattles = polandBattlesDetails
+        .filter(it => !it.finished)
+        .filter(it => !it.alreadyFought)
+        .filter(it => it.topKills.minKills < this.KILLS);
 
+    logger.info(`Found ${filteredPolandBattles.length} out of ${polandBattlesDetails.length} available battles`);
+
+    console.log(filteredPolandBattles);
   }
 
   private getTopKillsRange(battle: BattleStatsResponse, nationality: Nationality): TopKills {
@@ -63,8 +72,7 @@ export class TokenHunterJob implements DispatchJob {
 
   private getTopKills(battle: BattleStatsResponse, nationality: Nationality) {
     const battleNumber: string = Object.keys(battle.stats.current)[0];
-    console.log(battle.stats.current[battleNumber]['4']);
-    return battle.stats.current[battleNumber]['4'][nationality].top_kills;
+    return battle.stats.current[battleNumber][this.stateService.division as 4][nationality].top_kills;
   }
 
   private isBattleFinished(battle: BattleStatsResponse): boolean {
