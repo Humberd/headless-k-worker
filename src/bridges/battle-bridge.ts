@@ -22,6 +22,7 @@ export interface AttackConfig {
   killsLimit: number;
   battleType: BattleType;
   requiresTravel: boolean;
+  skipTravelBack?: boolean;
 }
 
 const logger = getLogger('BattleBridge');

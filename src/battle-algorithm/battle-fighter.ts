@@ -93,18 +93,18 @@ export class BattleFighter {
     try {
       return await this.battleBridge.startAttacking(config);
     } finally {
-      await this.onAfterFight(config.requiresTravel);
+      await this.onAfterFight(config.requiresTravel, config.skipTravelBack);
     }
   }
 
-  private async onAfterFight(requiresTravelHome: boolean) {
+  private async onAfterFight(requiresTravelHome: boolean, skipTravelBack: boolean) {
     const tasks: (() => Promise<any>)[] = [
       this.weeklyChallengeBridge.collectAllRewards.bind(this.weeklyChallengeBridge),
       this.rewardCollectorBridge.collectDailyTaskReward.bind(this.rewardCollectorBridge),
       this.battleBridge.collectDailyOrderReward.bind(this.battleBridge)
     ];
 
-    if (requiresTravelHome) {
+    if (requiresTravelHome && !skipTravelBack) {
       tasks.push(sleep.bind(null, 1500));
       tasks.push(this.travelBridge.travelHome.bind(this.travelBridge));
     }
