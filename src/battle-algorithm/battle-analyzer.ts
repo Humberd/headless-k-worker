@@ -39,6 +39,15 @@ export class BattleAnalyzer {
     };
   }
 
+  requiresTravelFor(battle: Battle, sideId: string): boolean {
+    const requiresTravel = this.requiresTravel(battle);
+    const sideIdIsDef = battle.def.id === Number(sideId);
+    if (sideIdIsDef) {
+      return requiresTravel[0]
+    }
+    return requiresTravel[1]
+  }
+
   /* This was rewritten from erep source code */
   private requiresTravel(battle: Battle): [boolean, boolean] {
     const currentLocationId = this.stateService.currentCountryLocationId;

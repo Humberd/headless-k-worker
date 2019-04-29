@@ -1,10 +1,12 @@
 import { DispatchJob } from '../dispatcher';
-import { BattleBridge } from '../bridges/battle-bridge';
+import { AttackConfig, BattleBridge } from '../bridges/battle-bridge';
 import { Battle, Type } from '../types/campains-response';
 import { StateService } from '../state.service';
 import { BattleStatsResponse } from '../types/battle-stats-response';
-import { Nationality } from '../battle-algorithm/battle-analyzer-enums';
+import { BattleType, Nationality } from '../battle-algorithm/battle-analyzer-enums';
 import { getLogger } from 'log4js';
+import { BattleAnalyzer } from '../battle-algorithm/battle-analyzer';
+import { BattleFighter } from '../battle-algorithm/battle-fighter';
 
 const logger = getLogger('TokenHunterJob');
 
@@ -17,10 +19,12 @@ export class TokenHunterJob implements DispatchJob {
   shouldStopRunning: () => boolean = () => false;
   timeInterval: number = 1_000_000;
 
-  private readonly KILLS = 10;
+  private readonly KILLS = 2;
 
   constructor(private battleBridge: BattleBridge,
-              private stateService: StateService) {
+              private stateService: StateService,
+              private battleAnalyzer: BattleAnalyzer,
+              private battleFighter: BattleFighter) {
 
   }
 
@@ -38,7 +42,7 @@ export class TokenHunterJob implements DispatchJob {
         details: response,
         topKills: this.getTopKillsRange(response, Number(it.sideId)),
         finished: this.isBattleFinished(response),
-        alreadyFought: this.alreadyFought(response, Number(it.sideId))
+        alreadyFought: this.alreadyFought(response, Number(it.sideId)),
       };
     }));
 
@@ -49,7 +53,18 @@ export class TokenHunterJob implements DispatchJob {
 
     logger.info(`Found ${filteredPolandBattles.length} out of ${polandBattlesDetails.length} available battles`);
 
-    console.log(filteredPolandBattles);
+    for (let bat of filteredPolandBattles) {
+      const attackConfig: AttackConfig = {
+        battleType: BattleType.TANK,
+        battleId: bat.battleId,
+        sideId: bat.sideId,
+        killsLimit: this.KILLS,
+        requiresTravel:  this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId)
+      };
+      logger.info(attackConfig);
+
+      await this.battleFighter.fight(attackConfig)
+    }
   }
 
   private getTopKillsRange(battle: BattleStatsResponse, nationality: Nationality): TopKills {

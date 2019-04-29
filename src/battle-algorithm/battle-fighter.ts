@@ -81,7 +81,7 @@ export class BattleFighter {
     return true;
   }
 
-  private async fight(config: AttackConfig) {
+  async fight(config: AttackConfig) {
     await this.battleBridge.chooseBattleSide(config.battleId, config.sideId);
 
     if (config.requiresTravel) {
