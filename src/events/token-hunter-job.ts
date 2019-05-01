@@ -36,52 +36,56 @@ export class TokenHunterJob implements DispatchJob {
     const countriesMap = this.battlesToMap(tankBattles);
 
     for (const [key, value] of countriesMap.entries()) {
-      await this.fightForCountry(value)
+      await this.fightForCountry(value);
     }
     // await this.fightForCountry(countriesMap.get(String(Nationality.NIGERIA)))
   }
 
   private async fightForCountry(battles: TokenHunterBattle[]) {
-    const polandBattlesDetails = await Promise.all(battles.map(async (it) => {
-      const response = await this.battleBridge.getBattleStats(it.battleId, this.DIVISION);
-      return {
-        ...it,
-        // battle: null,
-        details: response,
-        topKills: this.getTopKillsRange(response, Number(it.sideId)),
-        finished: this.isBattleFinished(response),
-        alreadyFought: this.alreadyFought(response, Number(it.sideId)),
-      };
-    }));
+    try {
+      const polandBattlesDetails = await Promise.all(battles.map(async (it) => {
+        const response = await this.battleBridge.getBattleStats(it.battleId, this.DIVISION);
+        return {
+          ...it,
+          // battle: null,
+          details: response,
+          topKills: this.getTopKillsRange(response, Number(it.sideId)),
+          finished: this.isBattleFinished(response),
+          alreadyFought: this.alreadyFought(response, Number(it.sideId)),
+        };
+      }));
 
-    const filteredPolandBattles = polandBattlesDetails
-        .filter(it => !it.finished)
-        .filter(it => !it.alreadyFought)
-        .filter(it => it.topKills.minKills < this.KILLS);
+      const filteredPolandBattles = polandBattlesDetails
+          .filter(it => !it.finished)
+          .filter(it => !it.alreadyFought)
+          .filter(it => it.topKills.minKills < this.KILLS);
 
-    logger.info(`Found ${filteredPolandBattles.length} out of ${polandBattlesDetails.length} available battles`);
+      logger.info(`Found ${filteredPolandBattles.length} out of ${polandBattlesDetails.length} available battles`);
 
-    for (let bat of filteredPolandBattles) {
-      const attackConfig: AttackConfig = {
-        battleType: BattleType.TANK,
-        battleId: bat.battleId,
-        sideId: bat.sideId,
-        killsLimit: this.KILLS,
-        requiresTravel: this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId),
-        skipTravelBack: true,
-        divisionSwitch: this.DIVISION,
-        battleNumber: this.getBattleNumber(bat.details)
-      };
-      logger.info(attackConfig);
+      for (let bat of filteredPolandBattles) {
+        const attackConfig: AttackConfig = {
+          battleType: BattleType.TANK,
+          battleId: bat.battleId,
+          sideId: bat.sideId,
+          killsLimit: this.KILLS,
+          requiresTravel: this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId),
+          skipTravelBack: true,
+          divisionSwitch: this.DIVISION,
+          battleNumber: this.getBattleNumber(bat.details)
+        };
+        logger.info(attackConfig);
 
-      try {
-        await this.battleFighter.fight(attackConfig);
-        await sleep(2000);
-      } catch (e) {
-        logger.error({...bat, details: null});
-        logger.error('Fight error', e)
+        try {
+          await this.battleFighter.fight(attackConfig);
+          await sleep(2000);
+        } catch (e) {
+          logger.error({...bat, details: null});
+          throw e;
+        }
+
       }
-
+    } catch (e) {
+      logger.error('Fight error', e);
     }
   }
 
@@ -90,7 +94,7 @@ export class TokenHunterJob implements DispatchJob {
 
     return {
       maxKills: (topKills[0] && Number(topKills[0].kills)) || 0,
-      minKills: (topKills[2] && Number(topKills[2].kills)) || 0
+      minKills: (topKills[1] && Number(topKills[1].kills)) || 0
     };
   }
 
