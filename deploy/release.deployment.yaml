@@ -20,8 +20,10 @@ spec:
           image: $(Build.Definitionname)
           imagePullPolicy: Always
           env:
-            - name: ERPK_RM
-              value: $(ERPK_RM)
+            - name: EMAIL
+              value: $(EREP_EMAIL)
+            - name: PASSWORD
+              value: $(EREP_PASSWORD)
             - name: SERVER_URL
               value: 'https://$(SERVER_DOMAIN)'
             - name: SERVER_TOKEN
