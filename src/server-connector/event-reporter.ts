@@ -12,10 +12,11 @@ export class EventReporter {
 
   }
 
-  async reportStatus() {
+  async reportStatus(message?: string) {
     return await this.safeResponse(this.serverNetworkProxy.reportStatus({
       status: this.stateService.status,
-      version: this.stateService.version
+      version: this.stateService.version,
+      message: message
     }));
   }
 
@@ -34,7 +35,7 @@ export class EventReporter {
   /**
    *  We can't shut the app down, because k8s would restart the app, which is not a desired solution
    */
-  reportFatalError(jobId: string, jobName: string, error: any): void {
+  async reportFatalError(jobId: string, jobName: string, error: any) {
     try {
       logger.fatal(error);
       logger.fatal('---------------------- UNRECOVERABLE ERROR -------------------');
@@ -42,11 +43,19 @@ export class EventReporter {
       logger.fatal('------------------------- SHUTTING DOWN! ---------------------');
 
       this.stateService.status = AppStatus.FATAL_ERROR;
+      this.reportStatus(`${jobName}: ${this.parseError(error).substr(0, 100)}`);
       this.dispatcher.shutdown();
     } catch (e) {
       logger.fatal('!!!!!!!!!!!!!!!!!!!!!!!!! ERROR WHILE REPORTING FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       logger.fatal(e);
     }
+  }
+
+  private parseError(error: any): string {
+    if (typeof error === 'object') {
+      return error.message || JSON.stringify(error);
+    }
+    return `${error}`;
   }
 
   reportNormalError(jobId: string, jobName: string, error: any) {

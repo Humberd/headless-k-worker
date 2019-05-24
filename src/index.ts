@@ -67,7 +67,7 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Token refresher',
       timeInterval: time(14, 'minutes'),
       handleError: async (job, error) => {
-        eventReporter.reportFatalError(job.id, job.name, error);
+        await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
       },
       actions: [
@@ -80,7 +80,7 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Weekly challenge refresher',
       timeInterval: time(14, 'minutes'),
       handleError: async (job, error) => {
-        eventReporter.reportFatalError(job.id, job.name, error);
+        await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
       },
       actions: [
@@ -93,7 +93,7 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Eat',
       timeInterval: time(7, 'minutes'), // every 7 minutes
       handleError: async (job, error) => {
-        eventReporter.reportFatalError(job.id, job.name, error);
+        await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
       },
       actions: [
@@ -217,7 +217,7 @@ function getJobsDispatcher(): Dispatcher {
   dispatcher.onError(async (job, error) => {
     /* Nan errors are unpredictable, because we have no control over them and they can occur when 3rd party data changes */
     if (error instanceof NaNError) {
-      eventReporter.reportFatalError(job.id, job.name, error);
+      await eventReporter.reportFatalError(job.id, job.name, error);
       return true;
     }
 
