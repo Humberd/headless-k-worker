@@ -11,6 +11,7 @@ export enum AppStatus {
 export class StateService {
   @log() version: string = process.env.BUILD_ID;
   @log() status: AppStatus = AppStatus.OK;
+  @log() statusMessage: string;
   @log() serverUrl: string = process.env.SERVER_URL;
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
 

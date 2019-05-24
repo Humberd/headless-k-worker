@@ -12,11 +12,11 @@ export class EventReporter {
 
   }
 
-  async reportStatus(message?: string) {
+  async reportStatus() {
     return await this.safeResponse(this.serverNetworkProxy.reportStatus({
       status: this.stateService.status,
       version: this.stateService.version,
-      message: message
+      message: this.stateService.statusMessage
     }));
   }
 
@@ -43,7 +43,7 @@ export class EventReporter {
       logger.fatal('------------------------- SHUTTING DOWN! ---------------------');
 
       this.stateService.status = AppStatus.FATAL_ERROR;
-      this.reportStatus(`${jobName}: ${this.parseError(error).substr(0, 100)}`);
+      this.stateService.statusMessage = `${jobName}: ${this.parseError(error).substr(0, 300)}`;
       this.dispatcher.shutdown();
     } catch (e) {
       logger.fatal('!!!!!!!!!!!!!!!!!!!!!!!!! ERROR WHILE REPORTING FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!');
