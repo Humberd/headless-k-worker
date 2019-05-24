@@ -11,6 +11,12 @@ import { sleep } from '../utils';
 
 const logger = getLogger('TokenHunterJob');
 
+/**
+ * 2019 Spring event.
+ *
+ * It scanned all battles and fought where player could be in top 3 kills, so that player received tokens.
+ * It also changed divisions.
+ */
 export class TokenHunterJob implements DispatchJob {
   actions: Array<() => Promise<any>> = [
     () => this.startSequence()

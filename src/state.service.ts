@@ -40,9 +40,9 @@ export class StateService {
   @log() lastGoldBuyDay: number;
 
   @log() userConfig = {
-    battleTypePriority: BattleType.AIR, // todo: change after event
-    tankPrimaryWeapon: WeaponType.BAZOOKA, // todo: change after event
-    tankSecondaryWeapon: WeaponType.Q7, // todo: change after event
+    battleTypePriority: BattleType.AIR,
+    tankPrimaryWeapon: WeaponType.NO_WEAPON,
+    tankSecondaryWeapon: WeaponType.Q7,
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
 

@@ -16,10 +16,10 @@ import { AttackConfigChooser } from './battle-algorithm/attack-config-chooser';
 import { BattleFighter } from './battle-algorithm/battle-fighter';
 import { TravelBridge } from './bridges/travel-bridge';
 import * as log4js from 'log4js';
+import { getLogger } from 'log4js';
 import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
-import { TokenHunterJob } from './events/token-hunter-job';
 
 require('dotenv').config();
 
@@ -75,18 +75,18 @@ function getJobsDispatcher(): Dispatcher {
         () => sleep(1000)
       ]
     },
-    // {
-    //   id: 'wc-refresher',
-    //   name: 'Weekly challenge refresher',
-    //   timeInterval: time(14, 'minutes'),
-    //   handleError: async (job, error) => {
-    //     eventReporter.reportFatalError(job.id, job.name, error);
-    //     return true;
-    //   },
-    //   actions: [
-    //     () => weeklyChallengeBridge.refreshWeeklyChallengeInformation()
-    //   ]
-    // },
+    {
+      id: 'wc-refresher',
+      name: 'Weekly challenge refresher',
+      timeInterval: time(14, 'minutes'),
+      handleError: async (job, error) => {
+        eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      },
+      actions: [
+        () => weeklyChallengeBridge.refreshWeeklyChallengeInformation()
+      ]
+    },
     {
       // Eatting job must always start before attacking job, because it updates health state.
       id: 'eatting',
@@ -102,115 +102,114 @@ function getJobsDispatcher(): Dispatcher {
         () => sleep(2000)
       ]
     },
-    new TokenHunterJob(battleBridge, stateService, battleAnalyzer, battleFighter)
-    // {
-    //   id: 'work-daily',
-    //   name: 'Work daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work overtime checker');
-    //     if (stateService.workedToday()) {
-    //       logger.info('Already worked');
-    //       return true;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   actions: [
-    //     () => workBridge.workDaily(),
-    //     () => sleep(2000),
-    //   ]
-    // },
-    // {
-    //   id: 'work-overtime-daily',
-    //   name: 'Work overtime daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work overtime checker');
-    //     if (stateService.workedOvertimeToday()) {
-    //       logger.info('Already worked today');
-    //       return true;
-    //     }
-    //     return false;
-    //   },
-    //   actions: [
-    //     () => workBridge.workOvertimeDaily(),
-    //     () => sleep(2000),
-    //   ]
-    // },
-    // {
-    //   id: 'work-production-daily',
-    //   name: 'Work production daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work Production checker');
-    //     if (stateService.workedProductionToday()) {
-    //       logger.info('Already worked today');
-    //       return true;
-    //     }
-    //
-    //     /* We are not running production, because it uses too much hp, which we will use on fighting in epics.
-    //     * Try work production 6 hours after day start */
-    //     if (stateService.isWcStartDay() &&
-    //         !stateService.dayTimeElapsed(time(6, 'hours'))) {
-    //       logger.info('Not working. Must elapse at least 6 hours in wc start day.');
-    //       // return true;
-    //       return false;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   actions: [
-    //     () => workBridge.workProductionDaily(),
-    //     () => sleep(2000),
-    //   ]
-    // },
-    // {
-    //   id: 'train-daily',
-    //   name: 'Train daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     return stateService.trainedToday();
-    //   },
-    //   actions: [
-    //     () => trainBridge.trainDaily(),
-    //     () => sleep(2000),
-    //   ]
-    // },
-    // {
-    //   id: 'fighting',
-    //   name: 'Fight',
-    //   timeInterval: time(1, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Fight checker');
-    //
-    //     const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
-    //     if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
-    //       logger.info('Not fighting. Waiting with HP regen to the next day');
-    //       return true;
-    //     }
-    //
-    //     // if (!stateService.workedToday() ||
-    //     //     !stateService.workedOvertimeToday() ||
-    //     //     !stateService.trainedToday()) {
-    //     //   logger.info('Not fighting. Some daily tasks has not yet been completed');
-    //     //   return true;
-    //     // }
-    //
-    //     /* Start attacking 4 hours after wc day start */
-    //     if (!stateService.workedProductionToday() &&
-    //         stateService.isWcStartDay() &&
-    //         !stateService.dayTimeElapsed(time(4, 'hours'))) {
-    //       logger.info('Not fighting. Production daily task has not yet been completed');
-    //       return true;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   actions: [
-    //     () => battleFighter.tryFight()
-    //   ]
-    // }
+    {
+      id: 'work-daily',
+      name: 'Work daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedToday()) {
+          logger.info('Already worked');
+          return true;
+        }
+
+        return false;
+      },
+      actions: [
+        () => workBridge.workDaily(),
+        () => sleep(2000),
+      ]
+    },
+    {
+      id: 'work-overtime-daily',
+      name: 'Work overtime daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedOvertimeToday()) {
+          logger.info('Already worked today');
+          return true;
+        }
+        return false;
+      },
+      actions: [
+        () => workBridge.workOvertimeDaily(),
+        () => sleep(2000),
+      ]
+    },
+    {
+      id: 'work-production-daily',
+      name: 'Work production daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work Production checker');
+        if (stateService.workedProductionToday()) {
+          logger.info('Already worked today');
+          return true;
+        }
+
+        /* We are not running production, because it uses too much hp, which we will use on fighting in epics.
+        * Try work production 6 hours after day start */
+        if (stateService.isWcStartDay() &&
+            !stateService.dayTimeElapsed(time(6, 'hours'))) {
+          logger.info('Not working. Must elapse at least 6 hours in wc start day.');
+          // return true;
+          return false;
+        }
+
+        return false;
+      },
+      actions: [
+        () => workBridge.workProductionDaily(),
+        () => sleep(2000),
+      ]
+    },
+    {
+      id: 'train-daily',
+      name: 'Train daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        return stateService.trainedToday();
+      },
+      actions: [
+        () => trainBridge.trainDaily(),
+        () => sleep(2000),
+      ]
+    },
+    {
+      id: 'fighting',
+      name: 'Fight',
+      timeInterval: time(1, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Fight checker');
+
+        const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
+        if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
+          logger.info('Not fighting. Waiting with HP regen to the next day');
+          return true;
+        }
+
+        // if (!stateService.workedToday() ||
+        //     !stateService.workedOvertimeToday() ||
+        //     !stateService.trainedToday()) {
+        //   logger.info('Not fighting. Some daily tasks has not yet been completed');
+        //   return true;
+        // }
+
+        /* Start attacking 4 hours after wc day start */
+        if (!stateService.workedProductionToday() &&
+            stateService.isWcStartDay() &&
+            !stateService.dayTimeElapsed(time(4, 'hours'))) {
+          logger.info('Not fighting. Production daily task has not yet been completed');
+          return true;
+        }
+
+        return false;
+      },
+      actions: [
+        () => battleFighter.tryFight()
+      ]
+    }
   ];
 
   const dispatcher = new Dispatcher('Jobs', jobs);
