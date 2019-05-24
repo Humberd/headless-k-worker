@@ -38,7 +38,6 @@ export class KeepaliveBridge {
 
     this.stateService._token = response.csrf;
     this.stateService.userId = String(response.id);
-    this.stateService.division = response.division;
     this.stateService.currentCountryLocationId = response.citizenshipCountryId;
 
 

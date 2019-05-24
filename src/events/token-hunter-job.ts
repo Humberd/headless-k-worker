@@ -115,7 +115,7 @@ export class TokenHunterJob implements DispatchJob {
 
   private getTopKills(battle: BattleStatsResponse, nationality: Nationality) {
     const battleNumber: string = Object.keys(battle.stats.current)[0];
-    return battle.stats.current[battleNumber][this.stateService.division as 4][nationality].top_kills;
+    return battle.stats.current[battleNumber][this.DIVISION][nationality].top_kills;
   }
 
   private getBattleNumber(battle: BattleStatsResponse): number {
