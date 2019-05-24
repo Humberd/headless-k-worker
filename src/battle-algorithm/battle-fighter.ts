@@ -25,20 +25,20 @@ export class BattleFighter {
   }
 
   async tryFight() {
+    if (!this.stateService.userConfig.enableFighting) {
+      logger.info('Fighting has not been enabled.');
+      return;
+    }
+
     const battles = await this.battleBridge.getBattles();
     const analyzedBattles = this.battleAnalyzer.analyzeBattles(battles);
-    const bestBattle = this.battleChooser.chooseBestBattle(analyzedBattles);
+    const bestBattle = await this.battleChooser.chooseBestBattle(analyzedBattles);
     const attackConfig = this.attackConfigChooser.calculateAttackConfig(bestBattle);
 
     logger.debug(attackConfig);
 
     if (!this.shouldFight(attackConfig, bestBattle)) {
       logger.info('~~ Not fighting ~~');
-      return;
-    }
-
-    if (!this.stateService.userConfig.enableFighting) {
-      logger.info('Fighting has not been enabled.');
       return;
     }
 
@@ -81,28 +81,34 @@ export class BattleFighter {
     return true;
   }
 
-  private async fight(config: AttackConfig) {
+  async fight(config: AttackConfig) {
     await this.battleBridge.chooseBattleSide(config.battleId, config.sideId);
 
     if (config.requiresTravel) {
       await this.travelBridge.travel(config.battleId, config.sideId);
     }
 
+    await this.battleBridge.changeWeapon(config.battleId, config.battleType);
+
+    if (config.divisionSwitch) {
+      await this.battleBridge.switchDivision(config.battleId, config.sideId, config.battleNumber, config.divisionSwitch)
+    }
+
     try {
       return await this.battleBridge.startAttacking(config);
     } finally {
-      await this.onAfterFight(config.requiresTravel);
+      await this.onAfterFight(config.requiresTravel, config.skipTravelBack);
     }
   }
 
-  private async onAfterFight(requiresTravelHome: boolean) {
+  private async onAfterFight(requiresTravelHome: boolean, skipTravelBack: boolean) {
     const tasks: (() => Promise<any>)[] = [
       this.weeklyChallengeBridge.collectAllRewards.bind(this.weeklyChallengeBridge),
       this.rewardCollectorBridge.collectDailyTaskReward.bind(this.rewardCollectorBridge),
       this.battleBridge.collectDailyOrderReward.bind(this.battleBridge)
     ];
 
-    if (requiresTravelHome) {
+    if (requiresTravelHome && !skipTravelBack) {
       tasks.push(sleep.bind(null, 1500));
       tasks.push(this.travelBridge.travelHome.bind(this.travelBridge));
     }

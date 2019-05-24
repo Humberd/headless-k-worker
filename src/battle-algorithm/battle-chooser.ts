@@ -1,33 +1,40 @@
 import { BattleAnalysis } from './battle-analyzer';
-import { IntensityType } from './battle-analyzer-enums';
+import { BattleType, IntensityType } from './battle-analyzer-enums';
 import { StateService } from '../state.service';
-import { findMax } from '../utils';
 import { getLogger } from 'log4js';
+import { BattleStatsResponse } from '../types/battle-stats-response';
+import { BattleEqualRankDecision } from './battle-equal-rank-decision';
+import { BattleBridge } from '../bridges/battle-bridge';
 
 const logger = getLogger('BattleChooser');
+
+export interface DetailedBattleAnalysis extends BattleAnalysis {
+  score: number;
+  detailedStats: BattleStatsResponse;
+}
 
 /**
  * Implements an algorithm that chooses the best available battle
  */
 export class BattleChooser {
-  constructor(private stateService: StateService) {
+  constructor(private stateService: StateService,
+              private battleBridge: BattleBridge) {
 
   }
 
-  chooseBestBattle(battles: BattleAnalysis[]): BattleAnalysis {
-    const scores = battles.map(it => this.scoreBattle(it));
-    const max = findMax(scores);
+  async chooseBestBattle(battles: BattleAnalysis[]): Promise<DetailedBattleAnalysis> {
+    const detailedBattleAnalysis: DetailedBattleAnalysis[] = battles.map(it => ({
+      ...it,
+      score: this.scoreBattle(it),
+      detailedStats: null
+    }));
 
-    const theBestBattle = battles[max.index];
+    const maxScore = Math.max(...detailedBattleAnalysis.map(it => it.score));
+    const theBestBattles = detailedBattleAnalysis.filter(it => it.score === maxScore);
 
-    if (Object.entries(theBestBattle).length === 0 || !theBestBattle) {
-      logger.debug('battles', JSON.stringify(battles));
-      logger.debug('scores:', scores);
-      logger.debug('max:', max);
-    }
-    logger.debug(`The best battle with score ${max.value} is: ${JSON.stringify(theBestBattle)}`);
+    logger.info(`Found ${theBestBattles.length} battles with the highest score of ${maxScore}`);
 
-    return theBestBattle;
+    return this.decideEqualRank(theBestBattles, this.stateService.userConfig.battleTypePriority);
   }
 
   private scoreBattle(battle: BattleAnalysis): number {
@@ -56,4 +63,33 @@ export class BattleChooser {
 
     return score;
   }
+
+  private async decideEqualRank(battles: DetailedBattleAnalysis[], battleType: BattleType): Promise<DetailedBattleAnalysis> {
+    const decision = this.stateService.userConfig.equalRankDecision;
+
+    if (battles.length === 1) {
+      return battles[0];
+    }
+
+    switch (decision) {
+      case BattleEqualRankDecision.THE_FIRST_ONE: {
+        return battles[0];
+      }
+      default: {
+        throw new NotImplementedError(`${decision} has not been implemented`);
+      }
+
+    }
+  }
+
+  private async populateBattlesWithDetails(battles: DetailedBattleAnalysis[]): Promise<DetailedBattleAnalysis[]> {
+    return Promise.all(battles.map(async (it) => ({
+      ...it,
+      detailedStats: await this.battleBridge.getBattleStats(it.id)
+    })));
+  }
+}
+
+export class NotImplementedError extends Error {
+
 }

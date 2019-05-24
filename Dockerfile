@@ -3,6 +3,9 @@ FROM node:10.15-alpine
 ARG BUILD_ID
 ENV BUILD_ID ${BUILD_ID}
 
+RUN apk add tzdata
+ENV TZ=Europe/Poland
+
 WORKDIR /usr/app/src
 
 COPY ./package.json ./package-lock.json ./

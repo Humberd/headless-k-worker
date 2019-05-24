@@ -11,7 +11,6 @@ import { EattingBridge } from './bridges/eatting-bridge';
 import { StateService } from './state.service';
 import { KeepaliveBridge } from './bridges/keepalive-bridge';
 import { BattleAnalyzer } from './battle-algorithm/battle-analyzer';
-import { ProfileBridge } from './bridges/profile-bridge';
 import { BattleChooser } from './battle-algorithm/battle-chooser';
 import { AttackConfigChooser } from './battle-algorithm/attack-config-chooser';
 import { BattleFighter } from './battle-algorithm/battle-fighter';
@@ -48,10 +47,9 @@ const rewardCollectorBridge = new RewardCollectorBridge(networkProxy);
 const eattingBridge = new EattingBridge(networkProxy, stateService);
 const keepaliveBridge = new KeepaliveBridge(networkProxy, stateService);
 const battleBridge = new BattleBridge(networkProxy, stateService, eattingBridge);
-const profileBridge = new ProfileBridge(networkProxy, stateService);
-const battleChooser = new BattleChooser(stateService);
+const battleChooser = new BattleChooser(stateService, battleBridge);
 const attackConfigChooser = new AttackConfigChooser(stateService);
-const travelBridge = new TravelBridge(networkProxy);
+const travelBridge = new TravelBridge(networkProxy, stateService);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
 const serverDispatcher: Dispatcher = startServerDispatcher()
@@ -73,23 +71,8 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       },
       actions: [
-        // () => {
-        //   throw new Error('test error just in case');
-        // },
         () => keepaliveBridge.refreshTokens(),
         () => sleep(1000)
-      ]
-    },
-    {
-      id: 'profile-refresher',
-      name: 'Profile refresher',
-      timeInterval: time(14, 'minutes'),
-      handleError: async (job, error) => {
-        eventReporter.reportFatalError(job.id, job.name, error);
-        return true;
-      },
-      actions: [
-        () => profileBridge.refreshProfileInformation()
       ]
     },
     {
@@ -114,6 +97,7 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       },
       actions: [
+        () => eattingBridge.refreshEnergyData(),
         () => eattingBridge.eat(),
         () => sleep(2000)
       ]
@@ -252,7 +236,8 @@ function startServerDispatcher(): Dispatcher {
     timeInterval: time(15, 'seconds'),
     actions: [
       () => eventReporter.reportStatus()
-    ]
+    ],
+    disableLog: true
   }]);
 
   return dispatcher;

@@ -26,4 +26,16 @@ export class EattingBridge {
     logger.info(`Eatting result: (${oldHpPrim}+${oldHpSec}) -> (${newHpPrim}+${newHpSec})`);
   }
 
+  @phase('Refresh energy data')
+  async refreshEnergyData() {
+    const response = await this.networkProxy.getEnergyData();
+
+    this.stateService.healthRegen = response.recoveryRate;
+    this.stateService.healthBarLimit = response.recoverableEnergyLimit;
+    this.stateService.healthBarPrimary = response.energy;
+    this.stateService.healthBarSecondary = response.recoverableEnergy;
+
+    return response;
+  }
+
 }

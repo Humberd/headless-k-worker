@@ -2,7 +2,7 @@ export interface EatResponse {
   has_food_in_inventory: number;
   lowest_quality_food: LowestQualityFood;
   health: number; //current health
-  food_remaining: number; //seecond health bar
+  food_remaining: number; //second health bar
   food_remaining_reset: string;
   show_reset: boolean;
   hasSpecialFoodItem: number;

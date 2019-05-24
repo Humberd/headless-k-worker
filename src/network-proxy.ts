@@ -2,17 +2,24 @@ import {
   attackAir,
   attackTank,
   buyGold,
+  changeWeapon,
   chooseBattleSide,
   collectDailyOrderReward,
   collectDailyTaskReward,
   collectWeeklyChallengeReward,
   eat,
+  getBattleStats,
   getCampaignsList,
   getCompaniesPage,
   getMarketExchange,
+  getMobileEnergyData,
+  getMobileUserData,
   getProfile,
   getWeeklyChallengeData,
   login,
+  loginCredentialsMobile,
+  loginTokenMobile,
+  switchDivision,
   train,
   travel,
   TypedResponse,
@@ -28,6 +35,10 @@ import { JSDOM } from 'jsdom';
 import { StateService } from './state.service';
 import { TravelRequest } from './types/travel-request';
 import { getLogger } from 'log4js';
+import { ChangeWeaponRequest } from './types/change-weapon-request';
+import { LoginCredentialsRequest } from './types/login-credentials-request';
+import { LoginTokenRequest } from './types/login-token-request';
+import { SwitchDivisionRequest } from './types/switch-division-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -46,6 +57,10 @@ export class NetworkProxy {
 
   private get erpk_rm(): string {
     return this.stateService.erpk_rm;
+  }
+
+  private set erpk_rm(value: string){
+    this.stateService.erpk_rm = value;
   }
 
   private get _token(): string {
@@ -217,11 +232,7 @@ export class NetworkProxy {
   }
 
   async getProfile(userId: string) {
-    const response = await this.jsonResponseHandler(getProfile(this.erpk, userId));
-
-    this.stateService.currentCountryLocationId = response.location.residenceCountry.id;
-
-    return response;
+    return await this.jsonResponseHandler(getProfile(this.erpk, userId));
   }
 
   async collectDailyOrderReward() {
@@ -233,6 +244,64 @@ export class NetworkProxy {
 
   async travel(formData: TravelRequest) {
     return await this.jsonResponseHandler(travel(this.erpk, {
+      ...formData,
+      _token: this._token
+    }));
+  }
+
+  async changeWeapon(formData: ChangeWeaponRequest) {
+    const response = await this.jsonResponseHandler(changeWeapon(this.erpk, {
+      ...formData,
+      _token: this._token
+    }));
+
+    /* Double equals not triple. DO NOT CHANGE */
+    if (response.weaponId != formData.customizationLevel) {
+      throw new WeaponNotChangedError(formData);
+    }
+
+    return response;
+  }
+
+  async getBattleStats(battleId: string, division: number) {
+    return await this.jsonResponseHandler(getBattleStats(this.erpk, battleId, division));
+  }
+
+  async getUserData() {
+    return await this.jsonResponseHandler(getMobileUserData(this.erpk));
+  }
+
+  async getEnergyData() {
+    return await this.jsonResponseHandler(getMobileEnergyData(this.erpk));
+  }
+
+  async loginCredentials(formData: LoginCredentialsRequest) {
+    const response = await loginCredentialsMobile(formData);
+    const body = await response.json();
+
+    if (!body.id) {
+      throw new AuthorizationError(`Credentials authorization failed. ${JSON.stringify(body)}`);
+    }
+
+    this.extractErpk_rm(response.headers);
+    this.extractErpk(response.headers);
+
+    return body;
+  }
+
+  async loginToken(formData: LoginTokenRequest) {
+    const response = await loginTokenMobile(formData);
+    const body = await response.json();
+
+    this.handleJsonErrors(body);
+
+    this.extractErpk(response.headers);
+
+    return body;
+  }
+
+  async switchDivision(formData: SwitchDivisionRequest) {
+    return this.jsonResponseHandler(switchDivision(this.erpk, {
       ...formData,
       _token: this._token
     }));
@@ -273,6 +342,38 @@ export class NetworkProxy {
     this.saveToken(dom);
 
     return dom;
+  }
+
+  private extractErpk(headers: Headers) {
+    const erpk = this.getToken('erpk', headers);
+    if (!erpk) {
+      throw new AuthorizationError(`Erpk not found`)
+    }
+    this.erpk = erpk;
+  }
+
+  private extractErpk_rm(headers: Headers) {
+    const erpk_rm = this.getToken('erpk_rm', headers);
+    if (!erpk_rm) {
+      throw new AuthorizationError(`Erpk_rm not found`)
+    }
+    this.erpk_rm = erpk_rm;
+  }
+
+
+  private getToken(tokenName: string, headers: Headers): string {
+    const setCookies = headers.get('set-cookie');
+
+    const regex = new RegExp(tokenName + '=(\\w+);');
+    const result = regex.exec(setCookies);
+    if (result === null) {
+      logger.warn(`${tokenName} cannot be found in set-cookie header`);
+      return;
+    }
+
+    const token = result[1];
+
+    return token;
   }
 
   private saveErpk(headers: Headers) {
@@ -394,13 +495,18 @@ export class ElementNotFoundError extends Error {
 
 export class BattleEndedError extends Error {
   constructor(error: any) {
-    super(`Battle Ended Error: ${error}`)
+    super(`Battle Ended Error: ${error}`);
   }
-
 }
 
-export class NoRestPointsError extends Error {
-  constructor(public body: any) {
-    super('No rest points Error ' + JSON.stringify(body));
+export class WeaponNotChangedError extends Error {
+  constructor(data: any) {
+    super(`Weapon not changed ${JSON.stringify(data)}`);
+  }
+}
+
+export class AuthorizationError extends Error {
+  constructor(message: any) {
+    super(`Authorizaiton Error: ${message}`);
   }
 }

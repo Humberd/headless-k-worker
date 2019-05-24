@@ -4,7 +4,8 @@ import {
   LowHealthError,
   NetworkProxy,
   RateLimitError,
-  UnknownError
+  UnknownError,
+  WeaponNotChangedError
 } from '../network-proxy';
 import { StateService } from '../state.service';
 import { AttackResponse } from '../types/attack-response';
@@ -13,6 +14,7 @@ import { Battle } from '../types/campains-response';
 import { BattleType } from '../battle-algorithm/battle-analyzer-enums';
 import { phase, sleep } from '../utils';
 import { getLogger } from 'log4js';
+import { WeaponType } from '../types/change-weapon-request';
 
 export interface AttackConfig {
   battleId: string;
@@ -20,6 +22,9 @@ export interface AttackConfig {
   killsLimit: number;
   battleType: BattleType;
   requiresTravel: boolean;
+  skipTravelBack?: boolean;
+  divisionSwitch?: number;
+  battleNumber?: number;
 }
 
 const logger = getLogger('BattleBridge');
@@ -39,7 +44,20 @@ export class BattleBridge {
     return Object.values(response.battles);
   }
 
-  @phase('choose battle side')
+  @phase('Division switch')
+  async switchDivision(battleId: string, countryId: string, battleNumber: number, division: number) {
+    const response = await this.networkProxy.switchDivision({
+      battleId: battleId,
+      action: 'activate',
+      countryId: countryId,
+      division: division,
+      zoneId: battleNumber
+    });
+
+    return response;
+  }
+
+  @phase('Choose battle side')
   async chooseBattleSide(battleId: string, sideId: string) {
     return await this.networkProxy.chooseBattleSide(battleId, sideId);
   }
@@ -56,7 +74,41 @@ export class BattleBridge {
     return response;
   }
 
-  @phase('attacking')
+  @phase('Change Weapon')
+  async changeWeapon(battleId: string, battleType: BattleType) {
+    let primaryWeapon: WeaponType;
+    let secondaryWeapon: WeaponType;
+
+    if (battleType === BattleType.TANK) {
+      primaryWeapon = this.stateService.userConfig.tankPrimaryWeapon;
+      secondaryWeapon = this.stateService.userConfig.tankSecondaryWeapon;
+    } else {
+      primaryWeapon = this.stateService.userConfig.airPrimaryWeapon;
+      secondaryWeapon = this.stateService.userConfig.airSecondaryWeapon;
+    }
+
+    try {
+      return await this.networkProxy.changeWeapon({
+        battleId: battleId,
+        customizationLevel: primaryWeapon
+      });
+    } catch (e) {
+      if (e instanceof WeaponNotChangedError) {
+        return await this.networkProxy.changeWeapon({
+          battleId: battleId,
+          customizationLevel: secondaryWeapon
+        });
+      }
+    }
+
+  }
+
+  @phase('Get battle stats')
+  async getBattleStats(battleId: string, division = 4) {
+    return this.networkProxy.getBattleStats(battleId, division);
+  }
+
+  @phase('Attacking')
   async startAttacking({battleId, sideId, killsLimit, battleType}: AttackConfig) {
     return new Promise((resolve, reject) => {
       let rateLimitTimeMs = this.RATE_LIMIT_MS;

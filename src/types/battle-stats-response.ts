@@ -1,3 +1,5 @@
+import { Nationality } from '../battle-algorithm/battle-analyzer-enums';
+
 export interface BattleStatsResponse {
   stats: Stats;
   zone_finished: boolean;
@@ -17,20 +19,19 @@ export interface BattleStatsResponse {
 }
 
 export interface Division {
-  '34': The34;
-  '35': The34;
-  bar: {[key: string]: number | {[key: string]: The35_Value} | null | string};
+  bar: {[key: string]: Bar};
   created_at: string;
-  defence_shield: {[key: string]: number | {[key: string]: The35_Value} | null | string};
-  domination: {[key: string]: number | {[key: string]: The35_Value} | null | string};
+  defence_shield: {[key: string]: Bar};
+  domination: {[key: string]: Bar};
+  [key: string]: The37_Class | any;
 }
 
-export interface The34 {
+export interface The37_Class {
   '1': The1;
   '2': The1;
   '3': The1;
   '4': The1;
-  '11': The1;
+  '11': The11;
   total: number;
 }
 
@@ -40,21 +41,29 @@ export interface The1 {
   won: number;
 }
 
+export interface The11 {
+  points: number;
+  domination: number;
+  won: number;
+}
+
+export type Bar = number | {[key: string]: The35_Value} | null | string;
+
 export interface The35_Value {
   top_damage: Top[];
   top_kills: Top[];
 }
 
 export interface Top {
-  battle_id: string;
+  battle_id: null | string;
   zone_id: string;
-  division: string;
-  citizen_id: string;
-  damage: string;
-  kills: string;
-  side_country_id: string;
+  division: null | string;
+  citizen_id: null | string;
+  damage: null | string;
+  kills: null | string;
+  side_country_id: null | string;
   type?: Type;
-  hits?: string;
+  hits?: null;
 }
 
 export enum Type {
@@ -79,11 +88,21 @@ export interface Logs {
 export interface Stats {
   overall: Overall[];
   current: Current;
-  personal: {[key: string]: Personal};
+  personal: Personal[];
 }
 
 export interface Current {
-  '7': {[key: string]: number | {[key: string]: The35_Value} | null | string};
+  [key: string]: {
+    '1': CurrentNationalities
+    '2': CurrentNationalities
+    '3': CurrentNationalities
+    '4': CurrentNationalities
+    '11': CurrentNationalities
+  };
+}
+
+export type CurrentNationalities = {
+  [key in keyof typeof Nationality]: The35_Value
 }
 
 export interface Overall {
@@ -91,9 +110,9 @@ export interface Overall {
 }
 
 export interface Personal {
-  '35': Personal35;
+  '': Empty;
 }
 
-export interface Personal35 {
+export interface Empty {
   top_damage: Top[];
 }

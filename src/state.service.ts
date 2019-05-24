@@ -1,5 +1,7 @@
 import { BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
+import { WeaponType } from './types/change-weapon-request';
+import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
 
 export enum AppStatus {
   OK = 'OK',
@@ -13,6 +15,8 @@ export class StateService {
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
 
   @log() erpk: string;
+  @log({secure: true}) email: string = process.env.EMAIL;
+  @log({secure: true}) password: string = process.env.PASSWORD;
   @log({secure: true}) erpk_rm: string = process.env.ERPK_RM; //remember_me token
   @log() _token: string;
 
@@ -36,8 +40,16 @@ export class StateService {
 
   @log() userConfig = {
     battleTypePriority: BattleType.AIR,
+    tankPrimaryWeapon: WeaponType.NO_WEAPON,
+    tankSecondaryWeapon: WeaponType.Q7,
+    airPrimaryWeapon: WeaponType.NO_WEAPON,
+    airSecondaryWeapon: WeaponType.NO_WEAPON,
+
+    equalRankDecision: BattleEqualRankDecision.THE_FIRST_ONE,
+
     nationalityPriority: Nationality.POLAND,
-    maxKillsIn1Go: 103,
+
+    maxKillsIn1Go: 165, // todo: change after event
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 200,
     minimalNormalFightSecondaryHpPercent: 0.9,
@@ -56,7 +68,7 @@ export class StateService {
     return this.lastWorkDay === this.currentDay;
   }
 
-  workedOvertimeToday(): boolean {
+  workedOvertimeToday():  boolean {
     return this.lastWorkOvertimeDay === this.currentDay;
   }
 
