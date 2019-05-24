@@ -9,6 +9,7 @@ export interface DispatchJob {
   shouldStopRunning?: () => boolean; // true when stop run
   handleError?: DispatchJobErrorHandler;
   actions: Array<() => Promise<any>>;
+  disableLog?: boolean;
 }
 
 export interface InternalDispatchJob extends DispatchJob {
@@ -24,10 +25,10 @@ export class Dispatcher {
 
   constructor(dispatcherName: string, config: DispatchJob[]) {
     this.config = config.map(it => ({
-      ...it,
       lastExecution: 0,
-      shouldStopRunning: it.shouldStopRunning || (() => false),
-      handleError: it.handleError || (async () => false)
+      shouldStopRunning: () => false,
+      handleError: async () => false,
+      ...it,
     }));
 
     this.logger = getLogger(`${dispatcherName} Dispatcher`)
@@ -74,9 +75,9 @@ export class Dispatcher {
           continue;
         }
 
-        this.logger.info(`${job.name} - Executing...`);
+        !job.disableLog && this.logger.info(`${job.name} - Executing...`);
         await this.handleJob(job);
-        this.logger.info(`${job.name} - COMPLETED`);
+        !job.disableLog && this.logger.info(`${job.name} - COMPLETED`);
 
       }
     }
