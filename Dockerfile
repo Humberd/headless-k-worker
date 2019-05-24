@@ -3,8 +3,10 @@ FROM node:10.15-alpine
 ARG BUILD_ID
 ENV BUILD_ID ${BUILD_ID}
 
-RUN apk add tzdata
-ENV TZ=Europe/Poland
+RUN apk --update add \
+		tzdata \
+	&& cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+	&& apk del tzdata
 
 WORKDIR /usr/app/src
 
