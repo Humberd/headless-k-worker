@@ -9,6 +9,7 @@ import { noExceptionExecutor, sleep } from '../utils';
 import { IntensityType } from './battle-analyzer-enums';
 import { StateService } from '../state.service';
 import { getLogger } from 'log4js';
+import { JobResponse } from '../dispatcher/types';
 
 const logger = getLogger('BattleFighter');
 
@@ -24,7 +25,7 @@ export class BattleFighter {
 
   }
 
-  async tryFight() {
+  async tryFight(): Promise<JobResponse> {
     if (!this.stateService.userConfig.enableFighting) {
       logger.info('Fighting has not been enabled.');
       return;
@@ -42,7 +43,8 @@ export class BattleFighter {
       return;
     }
 
-    return this.fight(attackConfig);
+    await this.fight(attackConfig);
+    return JobResponse.success();
   }
 
   private shouldFight(attackConfig: AttackConfig, battle: BattleAnalysis): boolean {

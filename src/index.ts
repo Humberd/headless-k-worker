@@ -166,40 +166,38 @@ function getJobsDispatcher(): Dispatcher {
       action: () => trainBridge.trainDaily(),
       afterAction: () => sleep(2000),
     },
-    // {
-    //   id: 'fighting',
-    //   name: 'Fight',
-    //   timeInterval: time(1, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Fight checker');
-    //
-    //     const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
-    //     if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
-    //       logger.info('Not fighting. Waiting with HP regen to the next day');
-    //       return true;
-    //     }
-    //
-    //     // if (!stateService.workedToday() ||
-    //     //     !stateService.workedOvertimeToday() ||
-    //     //     !stateService.trainedToday()) {
-    //     //   logger.info('Not fighting. Some daily tasks has not yet been completed');
-    //     //   return true;
-    //     // }
-    //
-    //     /* Start attacking 4 hours after wc day start */
-    //     if (!stateService.workedProductionToday() &&
-    //         stateService.isWcStartDay() &&
-    //         !stateService.dayTimeElapsed(time(4, 'hours'))) {
-    //       logger.info('Not fighting. Production daily task has not yet been completed');
-    //       return true;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   actions: [
-    //     () => battleFighter.tryFight()
-    //   ]
-    // }
+    {
+      id: 'fighting',
+      name: 'Fight',
+      timeInterval: time(1, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Fight checker');
+
+        const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
+        if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
+          logger.info('Not fighting. Waiting with HP regen to the next day');
+          return true;
+        }
+
+        // if (!stateService.workedToday() ||
+        //     !stateService.workedOvertimeToday() ||
+        //     !stateService.trainedToday()) {
+        //   logger.info('Not fighting. Some daily tasks has not yet been completed');
+        //   return true;
+        // }
+
+        /* Start attacking 4 hours after wc day start */
+        if (!stateService.workedProductionToday() &&
+            stateService.isWcStartDay() &&
+            !stateService.dayTimeElapsed(time(4, 'hours'))) {
+          logger.info('Not fighting. Production daily task has not yet been completed');
+          return true;
+        }
+
+        return false;
+      },
+      action: () => battleFighter.tryFight()
+    }
   ];
 
   const dispatcher = new Dispatcher('Jobs', jobs);

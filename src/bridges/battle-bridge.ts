@@ -109,14 +109,14 @@ export class BattleBridge {
   }
 
   @phase('Attacking')
-  async startAttacking({battleId, sideId, killsLimit, battleType}: AttackConfig) {
+  async startAttacking({battleId, sideId, killsLimit, battleType}: AttackConfig): Promise<number> {
     return new Promise((resolve, reject) => {
       let rateLimitTimeMs = this.RATE_LIMIT_MS;
       let killCount = 0;
 
       if (killsLimit <= 0) {
         logger.info(`Not starting the attack: Kill limit is ${killsLimit}`);
-        resolve();
+        resolve(killCount);
         return;
       }
 
@@ -136,7 +136,7 @@ export class BattleBridge {
 
           if (killCount >= killsLimit) {
             await attackStopHook(``);
-            resolve();
+            resolve(killCount);
             return;
           }
 
@@ -166,7 +166,7 @@ export class BattleBridge {
         /* We only want to attack when secondar healthbar is high enough */
         if (this.stateService.healthBarSecondary < 60) {
           await attackStopHook(`Secondary health bar (${this.stateService.healthBarSecondary}) is not high enough to attack more`);
-          resolve();
+          resolve(killCount);
           return;
         }
 
