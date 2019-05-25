@@ -2,6 +2,7 @@ import { Dispatcher } from '../dispatcher';
 import { getLogger } from 'log4js';
 import { AppStatus, StateService } from '../state.service';
 import { ServerNetworkProxy } from './server-network-proxy';
+import { JobStatusRequest } from './_models/job-status-request';
 
 const logger = getLogger('Event Reporter');
 
@@ -12,12 +13,16 @@ export class EventReporter {
 
   }
 
-  async reportStatus() {
-    return await this.safeResponse(this.serverNetworkProxy.reportStatus({
+  async reportWorkerStatus() {
+    return await this.safeResponse(this.serverNetworkProxy.reportWorkerStatus({
       status: this.stateService.status,
       version: this.stateService.version,
       message: this.stateService.statusMessage
     }));
+  }
+
+  async reportJobStatus(status: JobStatusRequest) {
+    return await this.safeResponse(this.serverNetworkProxy.reportJobStatus(status))
   }
 
   /**

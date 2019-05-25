@@ -235,7 +235,7 @@ function startServerDispatcher(): Dispatcher {
     name: 'Status Reporter',
     timeInterval: time(15, 'seconds'),
     actions: [
-      () => eventReporter.reportStatus()
+      () => eventReporter.reportWorkerStatus()
     ],
     disableLog: true
   }]);

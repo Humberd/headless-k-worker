@@ -1,6 +1,7 @@
 import { default as fetch, RequestInit } from 'node-fetch';
 import { TypedResponse } from '../endpoints';
-import { StatusUpdateRequest } from './_models/status-request';
+import { WorkerStatusRequest } from './_models/status-request';
+import { JobStatusRequest } from './_models/job-status-request';
 
 interface RequestConfig {
   token: string;
@@ -23,10 +24,18 @@ async function request<T>(url: string, config: RequestConfig): Promise<TypedResp
 
 
 /* ------------------------------------------------------------- */
-export async function reportStatus(baseUrl: string, token: string, body: StatusUpdateRequest) {
+export async function reportWorkerStatus(baseUrl: string, token: string, body: WorkerStatusRequest) {
   return request(`${baseUrl}/status`, {
     method: 'PUT',
     body: body,
     token: token
   });
+}
+
+export async function reportJobStatus(baseUrl: string, token: string, body: JobStatusRequest) {
+  return request(`${baseUrl}/jobs`, {
+    method: 'PUT',
+    body: body,
+    token: token
+  })
 }

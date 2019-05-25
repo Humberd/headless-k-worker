@@ -1,15 +1,20 @@
 import { StateService } from '../state.service';
-import { StatusUpdateRequest } from './_models/status-request';
-import { reportStatus } from './server-endpoints';
+import { WorkerStatusRequest } from './_models/status-request';
+import { reportJobStatus, reportWorkerStatus } from './server-endpoints';
 import { TypedResponse } from '../endpoints';
+import { JobStatusRequest } from './_models/job-status-request';
 
 export class ServerNetworkProxy {
   constructor(private stateService: StateService) {
 
   }
 
-  async reportStatus(body: StatusUpdateRequest) {
-    return await this.handleJsonResponse(reportStatus(this.stateService.serverUrl, this.stateService.serverToken, body));
+  async reportWorkerStatus(body: WorkerStatusRequest) {
+    return await this.handleJsonResponse(reportWorkerStatus(this.stateService.serverUrl, this.stateService.serverToken, body));
+  }
+
+  async reportJobStatus(body: JobStatusRequest) {
+    return await this.handleJsonResponse(reportJobStatus(this.stateService.serverUrl, this.stateService.serverToken, body));
   }
 
   /* ------------------------------------------------------------- */

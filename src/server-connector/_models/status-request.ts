@@ -1,6 +1,6 @@
 import { AppStatus } from '../../state.service';
 
-export interface StatusUpdateRequest {
+export interface WorkerStatusRequest {
   version: string;
   status: AppStatus;
   message?: string;
