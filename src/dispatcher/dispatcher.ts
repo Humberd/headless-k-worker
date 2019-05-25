@@ -1,37 +1,31 @@
 import { getLogger, Logger } from 'log4js';
-
-export type DispatchJobErrorHandler = (job: DispatchJob, error: any) => Promise<boolean>;
-
-export interface DispatchJob {
-  id: string;
-  name: string;
-  timeInterval: number; // in millis
-  shouldStopRunning?: () => boolean; // true when stop run
-  handleError?: DispatchJobErrorHandler;
-  actions: Array<() => Promise<any>>;
-  disableLog?: boolean;
-}
-
-export interface InternalDispatchJob extends DispatchJob {
-  lastExecution: number; //timestamp
-}
+import {
+  DispatchJob,
+  DispatchJobErrorHandler,
+  DispatchJobSuccessHandler,
+  InternalDispatchJob,
+  JobResponse
+} from './types';
 
 export class Dispatcher {
   private timeoutId: NodeJS.Timeout;
   private readonly config: InternalDispatchJob[];
   private isStopped = true;
   private errorHandler: DispatchJobErrorHandler = async () => false;
+  private successHandler: DispatchJobSuccessHandler = async () => false;
   private readonly logger: Logger;
 
   constructor(dispatcherName: string, config: DispatchJob[]) {
     this.config = config.map(it => ({
       lastExecution: 0,
       shouldStopRunning: () => false,
+      afterAction: async () => false,
+      handleSuccess: async () => false,
       handleError: async () => false,
       ...it,
     }));
 
-    this.logger = getLogger(`${dispatcherName} Dispatcher`)
+    this.logger = getLogger(`${dispatcherName} Dispatcher`);
   }
 
   init(): Dispatcher {
@@ -76,22 +70,23 @@ export class Dispatcher {
         }
 
         !job.disableLog && this.logger.info(`${job.name} - Executing...`);
-        await this.handleJob(job);
+        await this.handleAction(job);
         !job.disableLog && this.logger.info(`${job.name} - COMPLETED`);
+
+        await this.handleAfterAction(job);
 
       }
     }
   }
 
-  private async handleJob(job: InternalDispatchJob) {
+  private async handleAction(job: InternalDispatchJob) {
+    let jobResponse: JobResponse;
     try {
-      for (const action of job.actions) {
-        await action();
-      }
+      jobResponse = await job.action();
     } catch (e) {
       const jobErrorHandlerResult = await job.handleError(job, e);
       if (jobErrorHandlerResult) {
-        return
+        return;
       }
 
       const generalErrorHandlerResult = await this.errorHandler(job, e);
@@ -101,10 +96,47 @@ export class Dispatcher {
 
       this.logger.error('Unhandled Error \n', e);
     }
+
+    const jobSuccessHandlerResult = await job.handleSuccess(job, jobResponse);
+    if (jobSuccessHandlerResult) {
+      return;
+    }
+
+    const generalSuccessHandlerResult = await this.successHandler(job, jobResponse);
+    if (generalSuccessHandlerResult) {
+      return;
+    }
+
+    this.logger.warn('Unhandled Success');
   }
+
+  private async handleAfterAction(job: InternalDispatchJob) {
+    try {
+      await job.afterAction();
+    } catch (e) {
+      this.logger.error('After Action Error', e);
+    }
+  }
+
+  // private notifyJobStatus(jobResponse: JobResponse, job: InternalDispatchJob) {
+  //   switch (jobResponse.status) {
+  //     case 'SUCCESS':
+  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.SUCCESS, jobResponse.message);
+  //     case 'ALREADY_DONE':
+  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.ALREADY_DONE, jobResponse.message);
+  //     case 'ERROR':
+  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.ERROR, , jobResponse.message);
+  //   }
+  // }
 
   onError(errorHandler: DispatchJobErrorHandler): Dispatcher {
     this.errorHandler = errorHandler;
+
+    return this;
+  }
+
+  onSuccess(successHandler: DispatchJobSuccessHandler): Dispatcher {
+    this.successHandler = successHandler;
 
     return this;
   }
