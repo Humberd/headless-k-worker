@@ -156,18 +156,16 @@ function getJobsDispatcher(): Dispatcher {
       action: () => workBridge.workProductionDaily(),
       afterAction: () => sleep(2000),
     },
-    // {
-    //   id: 'train-daily',
-    //   name: 'Train daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     return stateService.trainedToday();
-    //   },
-    //   actions: [
-    //     () => trainBridge.trainDaily(),
-    //     () => sleep(2000),
-    //   ]
-    // },
+    {
+      id: 'train-daily',
+      name: 'Train daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        return stateService.trainedToday();
+      },
+      action: () => trainBridge.trainDaily(),
+      afterAction: () => sleep(2000),
+    },
     // {
     //   id: 'fighting',
     //   name: 'Fight',
