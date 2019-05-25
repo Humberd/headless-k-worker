@@ -230,13 +230,15 @@ function getJobsDispatcher(): Dispatcher {
 }
 
 function startServerDispatcher(): Dispatcher {
-  // const dispatcher = new Dispatcher('Server', [{
-  //   id: 'status-reporter',
-  //   name: 'Status Reporter',
-  //   timeInterval: time(15, 'seconds'),
-  //   // action: () => JobResponse.ignore(eventReporter.reportWorkerStatus()),
-  //   disableLog: true
-  // }]);
-
-  return {} as any;
+  return new Dispatcher('Server', [{
+    id: 'status-reporter',
+    name: 'Status Reporter',
+    timeInterval: time(15, 'seconds'),
+    action: async () => {
+      await eventReporter.reportWorkerStatus();
+      return JobResponse.success()
+    },
+    handleSuccess: async (job, jobResponse) => true,
+    disableLog: true
+  }]);
 }
