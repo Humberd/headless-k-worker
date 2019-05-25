@@ -53,8 +53,8 @@ const attackConfigChooser = new AttackConfigChooser(stateService);
 const travelBridge = new TravelBridge(networkProxy, stateService);
 const battleFighter = new BattleFighter(battleBridge, battleAnalyzer, battleChooser, attackConfigChooser, weeklyChallengeBridge, rewardCollectorBridge, travelBridge, stateService);
 const serverNetworkProxy = new ServerNetworkProxy(stateService);
-const serverDispatcher: Dispatcher = startServerDispatcher();
-// .init();
+const serverDispatcher: Dispatcher = startServerDispatcher()
+    .init();
 const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
 const eventReporter = new EventReporter(stateService, serverNetworkProxy);
@@ -236,7 +236,7 @@ function startServerDispatcher(): Dispatcher {
     timeInterval: time(15, 'seconds'),
     action: async () => {
       await eventReporter.reportWorkerStatus();
-      return JobResponse.success()
+      return JobResponse.success();
     },
     handleSuccess: async (job, jobResponse) => true,
     disableLog: true
