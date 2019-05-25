@@ -1,7 +1,8 @@
 import { NetworkProxy } from '../network-proxy';
-import { handleErrorMessage, phase, sleep } from '../utils';
+import { handleErrorMessage, phase } from '../utils';
 import { getLogger } from 'log4js';
 import { StateService } from '../state.service';
+import { JobResponse } from '../dispatcher/types';
 
 const logger = getLogger('WorkBridge');
 
@@ -12,63 +13,54 @@ export class WorkBridge {
 
   }
 
-  async workAll() {
-    await this.workDaily();
-
-    await sleep(2000);
-
-    await this.workOvertimeDaily();
-
-    await sleep(2000);
-
-    await this.workProductionDaily();
-  }
-
   @phase('Daily work')
-  async workDaily() {
+  async workDaily(): Promise<JobResponse> {
     try {
-      const response = await this.networkProxy.work();
+      await this.networkProxy.work();
       this.stateService.lastWorkDay = this.stateService.currentDay;
 
-      return response;
+      return JobResponse.success();
     } catch (e) {
-      handleErrorMessage(e, 'already_worked', () => {
+      return handleErrorMessage(e, 'already_worked', () => {
         logger.info('Already worked');
         this.stateService.lastWorkDay = this.stateService.currentDay;
+        return JobResponse.alreadyDone('Already worked');
       });
     }
   }
 
   @phase('Daily overtime work')
-  async workOvertimeDaily() {
+  async workOvertimeDaily(): Promise<JobResponse> {
     try {
-      const response = await this.networkProxy.workOvertime();
+      await this.networkProxy.workOvertime();
       this.stateService.lastWorkOvertimeDay = this.stateService.currentDay;
 
-      return response;
+      return JobResponse.success();
     } catch (e) {
-      handleErrorMessage(e, 'no_rest_points', () => {
+      return handleErrorMessage(e, 'no_rest_points', () => {
         logger.info('Already worked');
         this.stateService.lastWorkOvertimeDay = this.stateService.currentDay;
+        return JobResponse.alreadyDone('Already worked');
+
       });
     }
   }
 
   @phase('Daily production work')
-  async workProductionDaily() {
+  async workProductionDaily(): Promise<JobResponse>  {
     const copaniesIds = await this.getCompaniesIds();
 
     if (copaniesIds.length === 0) {
       logger.info('Already worked');
       this.stateService.lastWorkProductionDay = this.stateService.currentDay;
 
-      return;
+      return JobResponse.alreadyDone('Already worked');
     }
 
     if (copaniesIds.length * 10 > this.stateService.healthBarPrimary) {
       logger.warn('Not enough hp to work');
 
-      return;
+      return JobResponse.error('Not enough hp to work');
     }
 
     const requestData = copaniesIds.map(it => ({
@@ -79,8 +71,10 @@ export class WorkBridge {
 
     await this.networkProxy.workProduction(requestData);
 
-    logger.info(`Worked in ${copaniesIds.length} companies`);
+    const msg = `Worked in ${copaniesIds.length} companies`;
+    logger.info(msg);
     this.stateService.lastWorkProductionDay = this.stateService.currentDay;
+    return JobResponse.success(msg);
   }
 
   private async getCompaniesIds(): Promise<string[]> {

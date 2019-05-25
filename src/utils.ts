@@ -19,8 +19,7 @@ export function sleep(ms: number) {
 export function handleErrorMessage(error: Error, desiredMessage: string, action: () => any) {
   if (error instanceof UnknownError) {
     if (error.body.message === desiredMessage) {
-      action();
-      return;
+      return action();
     }
     throw error;
   }
