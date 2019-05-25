@@ -19,7 +19,7 @@ import * as log4js from 'log4js';
 import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
-import { DispatchJob } from './dispatcher/types';
+import { DispatchJob, JobResponse } from './dispatcher/types';
 
 require('dotenv').config();
 
@@ -83,21 +83,22 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       }
     },
-    // {
-    //   // Eatting job must always start before attacking job, because it updates health state.
-    //   id: 'eatting',
-    //   name: 'Eat',
-    //   timeInterval: time(7, 'minutes'), // every 7 minutes
-    //   handleError: async (job, error) => {
-    //     await eventReporter.reportFatalError(job.id, job.name, error);
-    //     return true;
-    //   },
-    //   actions: [
-    //     () => eattingBridge.refreshEnergyData(),
-    //     () => eattingBridge.eat(),
-    //     () => sleep(2000)
-    //   ]
-    // },
+    {
+      // Eatting job must always start before attacking job, because it updates health state.
+      id: 'eatting',
+      name: 'Eat',
+      timeInterval: time(7, 'minutes'), // every 7 minutes
+      action: async () => {
+        await eattingBridge.refreshEnergyData();
+        await eattingBridge.eat();
+        return JobResponse.success()
+      },
+      afterAction: () => sleep(2000),
+      handleError: async (job, error) => {
+        await eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      }
+    },
     // {
     //   id: 'work-daily',
     //   name: 'Work daily',
