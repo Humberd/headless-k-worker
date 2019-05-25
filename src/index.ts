@@ -73,18 +73,16 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       }
     },
-    // {
-    //   id: 'wc-refresher',
-    //   name: 'Weekly challenge refresher',
-    //   timeInterval: time(14, 'minutes'),
-    //   handleError: async (job, error) => {
-    //     await eventReporter.reportFatalError(job.id, job.name, error);
-    //     return true;
-    //   },
-    //   actions: [
-    //     () => weeklyChallengeBridge.refreshWeeklyChallengeInformation()
-    //   ]
-    // },
+    {
+      id: 'wc-refresher',
+      name: 'Weekly challenge refresher',
+      timeInterval: time(14, 'minutes'),
+      action: () => weeklyChallengeBridge.refreshWeeklyChallengeInformation(),
+      handleError: async (job, error) => {
+        await eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      }
+    },
     // {
     //   // Eatting job must always start before attacking job, because it updates health state.
     //   id: 'eatting',

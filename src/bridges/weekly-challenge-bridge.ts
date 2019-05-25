@@ -3,6 +3,7 @@ import { Status } from '../types/weekly-challenge-data-response';
 import { phase } from '../utils';
 import { StateService } from '../state.service';
 import { getLogger } from 'log4js';
+import { JobResponse } from '../dispatcher/types';
 
 const logger = getLogger('WeeklyChallengeBridge');
 
@@ -36,8 +37,9 @@ export class WeeklyChallengeBridge {
   }
 
   @phase('Refresh Weekly Challenge Information')
-  async refreshWeeklyChallengeInformation() {
-    return await this.getWeeklyChallengeData();
+  async refreshWeeklyChallengeInformation(): Promise<JobResponse> {
+    await this.getWeeklyChallengeData();
+    return JobResponse.success()
   }
 
   async getWeeklyChallengeData() {
