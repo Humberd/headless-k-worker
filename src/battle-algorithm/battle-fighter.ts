@@ -40,7 +40,7 @@ export class BattleFighter {
 
     if (!this.shouldFight(attackConfig, bestBattle)) {
       logger.info('~~ Not fighting ~~');
-      return;
+      return JobResponse.alreadyDone('Conditions were not met');
     }
 
     await this.fight(attackConfig);
