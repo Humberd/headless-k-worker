@@ -43,7 +43,7 @@ export class ExchangeMarketBridge {
 
       return JobResponse.success();
     } catch (e) {
-      return handleErrorMessage(e, 'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You already reached the maximum limit.', () => {
+      return handleErrorMessage(e, 'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You cannot buy more than 0 Gold at this point.', () => {
         logger.info('Already bought Gold today');
         this.stateService.lastGoldBuyDay = this.stateService.currentDay;
         return JobResponse.alreadyDone('Already bought Gold today');
