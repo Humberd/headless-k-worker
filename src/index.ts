@@ -175,6 +175,10 @@ function getJobsDispatcher(): Dispatcher {
         return stateService.boughtGoldToday();
       },
       action: () => exchangeMarketBridge.buyDailyGold(),
+      handleError: async (job, error) => {
+        await eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      }
     },
     {
       id: 'fighting',
