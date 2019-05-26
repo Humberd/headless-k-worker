@@ -27,7 +27,7 @@ export class ExchangeMarketBridge {
 
     const offersOf10Gold = offers.filter(it => it.amount >= 10);
     if (offersOf10Gold.length === 0) {
-      throw new NoGoldOf10Offers('No valid 10 gold offer.\n' + JSON.stringify(offers));
+      return JobResponse.error('No valid 10 gold offer.');
     }
 
     try {
