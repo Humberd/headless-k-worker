@@ -46,7 +46,7 @@ export class EventReporter {
       logger.fatal('------------------------- SHUTTING DOWN! ---------------------');
 
       this.stateService.status = AppStatus.FATAL_ERROR;
-      this.stateService.statusMessage = `${jobName}: ${this.parseError(error).substr(0, 300)}`;
+      this.stateService.statusMessage = `${jobName}: ${this.stringifyError(error)}`;
       // this.dispatcher.shutdown(); // todo revert this change
     } catch (e) {
       logger.fatal('!!!!!!!!!!!!!!!!!!!!!!!!! ERROR WHILE REPORTING FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -54,11 +54,11 @@ export class EventReporter {
     }
   }
 
-  private parseError(error: any): string {
+  stringifyError(error: any): string {
     if (typeof error === 'object') {
-      return error.message || JSON.stringify(error);
+      return (error.message || JSON.stringify(error)).substr(0, 300);
     }
-    return `${error}`;
+    return `${error}`.substr(0, 300);
   }
 
 }

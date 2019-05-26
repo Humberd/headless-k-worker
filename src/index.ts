@@ -21,6 +21,7 @@ import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
 import { DispatchJob, JobResponse } from './dispatcher/types';
+import { JobStatus } from './server-connector/_models/job-status-request';
 
 require('dotenv').config();
 
@@ -208,6 +209,15 @@ function getJobsDispatcher(): Dispatcher {
       await eventReporter.reportFatalError(job.id, job.name, error);
       return true;
     }
+
+    eventReporter.reportJobStatus({
+      jobId: job.id,
+      jobName: job.name,
+      day: stateService.currentDay,
+      timeInterval: job.timeInterval,
+      status: JobStatus.ERROR,
+      message: eventReporter.stringifyError(error)
+    });
 
     return false;
   });
