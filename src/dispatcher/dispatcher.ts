@@ -118,17 +118,6 @@ export class Dispatcher {
     }
   }
 
-  // private notifyJobStatus(jobResponse: JobResponse, job: InternalDispatchJob) {
-  //   switch (jobResponse.status) {
-  //     case 'SUCCESS':
-  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.SUCCESS, jobResponse.message);
-  //     case 'ALREADY_DONE':
-  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.ALREADY_DONE, jobResponse.message);
-  //     case 'ERROR':
-  //       return this.eventReporter.reportJobStatus(job.id, job.name, JobStatus.ERROR, , jobResponse.message);
-  //   }
-  // }
-
   onError(errorHandler: DispatchJobErrorHandler): Dispatcher {
     this.errorHandler = errorHandler;
 
