@@ -50,7 +50,7 @@ export class StateService {
 
     nationalityPriority: Nationality.POLAND,
 
-    maxKillsIn1Go: 165, // todo: change after event
+    maxKillsIn1Go: 2, // todo: change after event
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 200,
     minimalNormalFightSecondaryHpPercent: 0.9,
@@ -79,6 +79,10 @@ export class StateService {
 
   trainedToday(): boolean {
     return this.lastTrainDay === this.currentDay;
+  }
+
+  boughtGoldToday(): boolean {
+    return this.lastGoldBuyDay === this.currentDay;
   }
 
   isWcStartDay(): boolean {

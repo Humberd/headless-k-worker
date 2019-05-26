@@ -1,4 +1,3 @@
-import { DispatchJob } from '../dispatcher';
 import { AttackConfig, BattleBridge } from '../bridges/battle-bridge';
 import { Battle, Type } from '../types/campains-response';
 import { StateService } from '../state.service';
@@ -8,6 +7,7 @@ import { getLogger } from 'log4js';
 import { BattleAnalyzer } from '../battle-algorithm/battle-analyzer';
 import { BattleFighter } from '../battle-algorithm/battle-fighter';
 import { sleep } from '../utils';
+import { DispatchJob, JobResponse } from '../dispatcher/types';
 
 const logger = getLogger('TokenHunterJob');
 
@@ -18,9 +18,10 @@ const logger = getLogger('TokenHunterJob');
  * It also changed divisions.
  */
 export class TokenHunterJob implements DispatchJob {
-  actions: Array<() => Promise<any>> = [
-    () => this.startSequence()
-  ];
+  action = async () => {
+    await this.startSequence();
+    return JobResponse.success()
+  };
   id: string = 'token-hunter';
   name: string = 'Token Hunter';
   shouldStopRunning: () => boolean = () => false;

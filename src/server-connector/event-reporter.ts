@@ -1,23 +1,26 @@
-import { Dispatcher } from '../dispatcher';
 import { getLogger } from 'log4js';
 import { AppStatus, StateService } from '../state.service';
 import { ServerNetworkProxy } from './server-network-proxy';
+import { JobStatusRequest } from './_models/job-status-request';
 
 const logger = getLogger('Event Reporter');
 
 export class EventReporter {
-  constructor(private dispatcher: Dispatcher,
-              private stateService: StateService,
+  constructor(private stateService: StateService,
               private serverNetworkProxy: ServerNetworkProxy) {
 
   }
 
-  async reportStatus() {
-    return await this.safeResponse(this.serverNetworkProxy.reportStatus({
+  async reportWorkerStatus() {
+    return await this.safeResponse(this.serverNetworkProxy.reportWorkerStatus({
       status: this.stateService.status,
       version: this.stateService.version,
       message: this.stateService.statusMessage
     }));
+  }
+
+  async reportJobStatus(status: JobStatusRequest) {
+    return await this.safeResponse(this.serverNetworkProxy.reportJobStatus(status))
   }
 
   /**
@@ -43,22 +46,19 @@ export class EventReporter {
       logger.fatal('------------------------- SHUTTING DOWN! ---------------------');
 
       this.stateService.status = AppStatus.FATAL_ERROR;
-      this.stateService.statusMessage = `${jobName}: ${this.parseError(error).substr(0, 300)}`;
-      this.dispatcher.shutdown();
+      this.stateService.statusMessage = `${jobName}: ${this.stringifyError(error)}`;
+      // this.dispatcher.shutdown(); // todo revert this change
     } catch (e) {
       logger.fatal('!!!!!!!!!!!!!!!!!!!!!!!!! ERROR WHILE REPORTING FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       logger.fatal(e);
     }
   }
 
-  private parseError(error: any): string {
+  stringifyError(error: any): string {
     if (typeof error === 'object') {
-      return error.message || JSON.stringify(error);
+      return (error.message || JSON.stringify(error)).substr(0, 300);
     }
-    return `${error}`;
+    return `${error}`.substr(0, 300);
   }
 
-  reportNormalError(jobId: string, jobName: string, error: any) {
-
-  }
 }

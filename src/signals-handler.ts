@@ -1,4 +1,4 @@
-import { Dispatcher } from './dispatcher';
+import { Dispatcher } from './dispatcher/dispatcher';
 import { getLogger } from 'log4js';
 import Signals = NodeJS.Signals;
 

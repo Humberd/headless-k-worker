@@ -3,6 +3,7 @@ import { StateService } from '../state.service';
 import { phase } from '../utils';
 import { UserDataResponse } from '../types/user-data-response';
 import { getLogger } from 'log4js';
+import { JobResponse } from '../dispatcher/types';
 
 const logger = getLogger('KeepaliveBridge');
 
@@ -24,11 +25,11 @@ export class KeepaliveBridge {
   async loginToken() {
     return await this.networkProxy.loginToken({
       erpk_rm: this.stateService.erpk_rm
-    })
+    });
   }
 
   @phase('Refreshing tokens')
-  async refreshTokens() {
+  async refreshTokens(): Promise<JobResponse> {
     let response: UserDataResponse;
     if (this.stateService.erpk_rm) {
       response = await this.loginToken();
@@ -45,6 +46,8 @@ export class KeepaliveBridge {
     const companiesPageDom = await this.networkProxy.getCompaniesPage();
 
     this.stateService.currentDay = this.getDay(companiesPageDom);
+
+    return JobResponse.success()
   }
 
   private getDay(dom: DocumentFragment): number {

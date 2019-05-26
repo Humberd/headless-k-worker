@@ -5,7 +5,7 @@ import { TrainBridge } from './bridges/train.bridge';
 import { WorkBridge } from './bridges/work-bridge';
 import { WeeklyChallengeBridge } from './bridges/weekly-challenge-bridge';
 import { RewardCollectorBridge } from './bridges/reward-collector.bridge';
-import { Dispatcher, DispatchJob } from './dispatcher';
+import { Dispatcher } from './dispatcher/dispatcher';
 import { NaNError, sleep, time } from './utils';
 import { EattingBridge } from './bridges/eatting-bridge';
 import { StateService } from './state.service';
@@ -20,6 +20,8 @@ import { getLogger } from 'log4js';
 import { EventReporter } from './server-connector/event-reporter';
 import { ServerNetworkProxy } from './server-connector/server-network-proxy';
 import { handleSignals } from './signals-handler';
+import { DispatchJob, JobResponse } from './dispatcher/types';
+import { JobStatus } from './server-connector/_models/job-status-request';
 
 require('dotenv').config();
 
@@ -39,7 +41,7 @@ log4js.configure({
 const stateService = new StateService();
 const battleAnalyzer = new BattleAnalyzer(stateService);
 const networkProxy = new NetworkProxy(stateService);
-const exchangeMarketBridge = new ExchangeMarketBridge(networkProxy);
+const exchangeMarketBridge = new ExchangeMarketBridge(networkProxy, stateService);
 const trainBridge = new TrainBridge(networkProxy, stateService);
 const workBridge = new WorkBridge(networkProxy, stateService);
 const weeklyChallengeBridge = new WeeklyChallengeBridge(networkProxy, stateService);
@@ -56,7 +58,7 @@ const serverDispatcher: Dispatcher = startServerDispatcher()
     .init();
 const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
-const eventReporter = new EventReporter(jobsDispatcher, stateService, serverNetworkProxy);
+const eventReporter = new EventReporter(stateService, serverNetworkProxy);
 
 handleSignals([jobsDispatcher, serverDispatcher]);
 
@@ -66,41 +68,38 @@ function getJobsDispatcher(): Dispatcher {
       id: 'token-refresher',
       name: 'Token refresher',
       timeInterval: time(14, 'minutes'),
+      action: () => keepaliveBridge.refreshTokens(),
+      afterAction: () => sleep(1000),
       handleError: async (job, error) => {
         await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
-      },
-      actions: [
-        () => keepaliveBridge.refreshTokens(),
-        () => sleep(1000)
-      ]
+      }
     },
     {
       id: 'wc-refresher',
       name: 'Weekly challenge refresher',
       timeInterval: time(14, 'minutes'),
+      action: () => weeklyChallengeBridge.refreshWeeklyChallengeInformation(),
       handleError: async (job, error) => {
         await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
-      },
-      actions: [
-        () => weeklyChallengeBridge.refreshWeeklyChallengeInformation()
-      ]
+      }
     },
     {
       // Eatting job must always start before attacking job, because it updates health state.
       id: 'eatting',
       name: 'Eat',
       timeInterval: time(7, 'minutes'), // every 7 minutes
+      action: async () => {
+        await eattingBridge.refreshEnergyData();
+        await eattingBridge.eat();
+        return JobResponse.success();
+      },
+      afterAction: () => sleep(2000),
       handleError: async (job, error) => {
         await eventReporter.reportFatalError(job.id, job.name, error);
         return true;
-      },
-      actions: [
-        () => eattingBridge.refreshEnergyData(),
-        () => eattingBridge.eat(),
-        () => sleep(2000)
-      ]
+      }
     },
     {
       id: 'work-daily',
@@ -115,10 +114,8 @@ function getJobsDispatcher(): Dispatcher {
 
         return false;
       },
-      actions: [
-        () => workBridge.workDaily(),
-        () => sleep(2000),
-      ]
+      action: () => workBridge.workDaily(),
+      afterAction: () => sleep(2000)
     },
     {
       id: 'work-overtime-daily',
@@ -132,10 +129,8 @@ function getJobsDispatcher(): Dispatcher {
         }
         return false;
       },
-      actions: [
-        () => workBridge.workOvertimeDaily(),
-        () => sleep(2000),
-      ]
+      action: () => workBridge.workOvertimeDaily(),
+      afterAction: () => sleep(2000)
     },
     {
       id: 'work-production-daily',
@@ -159,10 +154,8 @@ function getJobsDispatcher(): Dispatcher {
 
         return false;
       },
-      actions: [
-        () => workBridge.workProductionDaily(),
-        () => sleep(2000),
-      ]
+      action: () => workBridge.workProductionDaily(),
+      afterAction: () => sleep(2000),
     },
     {
       id: 'train-daily',
@@ -171,10 +164,21 @@ function getJobsDispatcher(): Dispatcher {
       shouldStopRunning: () => {
         return stateService.trainedToday();
       },
-      actions: [
-        () => trainBridge.trainDaily(),
-        () => sleep(2000),
-      ]
+      action: () => trainBridge.trainDaily(),
+      afterAction: () => sleep(2000),
+    },
+    {
+      id: 'buy-gold-daily',
+      name: 'Buy Gold daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        return stateService.boughtGoldToday();
+      },
+      action: () => exchangeMarketBridge.buyDailyGold(),
+      handleError: async (job, error) => {
+        await eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      }
     },
     {
       id: 'fighting',
@@ -206,9 +210,7 @@ function getJobsDispatcher(): Dispatcher {
 
         return false;
       },
-      actions: [
-        () => battleFighter.tryFight()
-      ]
+      action: () => battleFighter.tryFight()
     }
   ];
 
@@ -221,8 +223,29 @@ function getJobsDispatcher(): Dispatcher {
       return true;
     }
 
-    eventReporter.reportNormalError(job.id, job.name, error);
+    await eventReporter.reportJobStatus({
+      jobId: job.id,
+      jobName: job.name,
+      day: stateService.currentDay,
+      timeInterval: job.timeInterval,
+      status: JobStatus.ERROR,
+      message: eventReporter.stringifyError(error)
+    });
+
     return false;
+  });
+
+  dispatcher.onSuccess(async (job, jobResponse) => {
+    await eventReporter.reportJobStatus({
+      jobId: job.id,
+      jobName: job.name,
+      day: stateService.currentDay,
+      timeInterval: job.timeInterval,
+      status: jobResponse.status,
+      message: jobResponse.message
+    });
+
+    return true;
   });
 
 
@@ -230,15 +253,15 @@ function getJobsDispatcher(): Dispatcher {
 }
 
 function startServerDispatcher(): Dispatcher {
-  const dispatcher = new Dispatcher('Server', [{
+  return new Dispatcher('Server', [{
     id: 'status-reporter',
     name: 'Status Reporter',
     timeInterval: time(15, 'seconds'),
-    actions: [
-      () => eventReporter.reportStatus()
-    ],
+    action: async () => {
+      await eventReporter.reportWorkerStatus();
+      return JobResponse.success();
+    },
+    handleSuccess: async (job, jobResponse) => true,
     disableLog: true
   }]);
-
-  return dispatcher;
 }
