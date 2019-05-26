@@ -210,7 +210,7 @@ function getJobsDispatcher(): Dispatcher {
       return true;
     }
 
-    eventReporter.reportJobStatus({
+    await eventReporter.reportJobStatus({
       jobId: job.id,
       jobName: job.name,
       day: stateService.currentDay,
