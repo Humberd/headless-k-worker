@@ -41,7 +41,7 @@ log4js.configure({
 const stateService = new StateService();
 const battleAnalyzer = new BattleAnalyzer(stateService);
 const networkProxy = new NetworkProxy(stateService);
-const exchangeMarketBridge = new ExchangeMarketBridge(networkProxy);
+const exchangeMarketBridge = new ExchangeMarketBridge(networkProxy, stateService);
 const trainBridge = new TrainBridge(networkProxy, stateService);
 const workBridge = new WorkBridge(networkProxy, stateService);
 const weeklyChallengeBridge = new WeeklyChallengeBridge(networkProxy, stateService);
@@ -166,6 +166,15 @@ function getJobsDispatcher(): Dispatcher {
       },
       action: () => trainBridge.trainDaily(),
       afterAction: () => sleep(2000),
+    },
+    {
+      id: 'buy-gold-daily',
+      name: 'Buy Gold daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        return stateService.boughtGoldToday();
+      },
+      action: () => exchangeMarketBridge.buyDailyGold(),
     },
     {
       id: 'fighting',

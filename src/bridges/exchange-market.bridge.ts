@@ -2,6 +2,8 @@ import { NetworkProxy } from '../network-proxy';
 import { JSDOM } from 'jsdom';
 import { handleErrorMessage, phase } from '../utils';
 import { getLogger } from 'log4js';
+import { JobResponse } from '../dispatcher/types';
+import { StateService } from '../state.service';
 
 interface GoldExchangeOffer {
   id: string;
@@ -13,12 +15,13 @@ const logger = getLogger('ExchangeMarketBridge');
 
 export class ExchangeMarketBridge {
 
-  constructor(private networkProxy: NetworkProxy) {
+  constructor(private networkProxy: NetworkProxy,
+              private stateService: StateService) {
 
   }
 
   @phase('Daily gold exchange')
-  async buyDailyGold(): Promise<GoldExchangeOffer> {
+  async buyDailyGold(): Promise<JobResponse> {
     // todo: add handling `This exchange offer does not exist.` error message
     const offers = await this.getOffers();
 
@@ -36,11 +39,14 @@ export class ExchangeMarketBridge {
       });
 
       logger.info(`Bought 10 gold for ${(offersOf10Gold[0].price * 10)} PLN. Current Gold: ${response.gold.value}. Current PLN: ${response.ecash.value}.`);
-      return offersOf10Gold[0];
+      this.stateService.lastGoldBuyDay = this.stateService.currentDay;
+
+      return JobResponse.success();
     } catch (e) {
-      handleErrorMessage(e, 'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You already reached the maximum limit.', () => {
+      return handleErrorMessage(e, 'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You already reached the maximum limit.', () => {
         logger.info('Already bought Gold today');
-        return offersOf10Gold[0];
+        this.stateService.lastGoldBuyDay = this.stateService.currentDay;
+        return JobResponse.alreadyDone('Already bought Gold today');
       });
     }
   }

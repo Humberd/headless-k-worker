@@ -81,6 +81,10 @@ export class StateService {
     return this.lastTrainDay === this.currentDay;
   }
 
+  boughtGoldToday(): boolean {
+    return this.lastGoldBuyDay === this.currentDay;
+  }
+
   isWcStartDay(): boolean {
     const wcDay = Math.floor(this.weeklyChallengeTimeLeftMs / time(1, 'days'));
 
