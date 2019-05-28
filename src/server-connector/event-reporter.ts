@@ -56,9 +56,9 @@ export class EventReporter {
 
   stringifyError(error: any): string {
     if (typeof error === 'object') {
-      return (error.message || JSON.stringify(error)).substr(0, 300);
+      return (error.message || JSON.stringify(error));
     }
-    return `${error}`.substr(0, 300);
+    return `${error}`;
   }
 
 }
