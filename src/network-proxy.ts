@@ -337,7 +337,7 @@ export class NetworkProxy {
 
     this.saveErpk(resp.headers);
 
-    this.handleHtmlErrors(dom, resp.headers);
+    this.handleHtmlErrors(dom, resp.headers, resp.url);
 
     this.saveToken(dom);
 
@@ -422,10 +422,10 @@ export class NetworkProxy {
     }
   }
 
-  private handleHtmlErrors(dom: DocumentFragment, headers: Headers) {
+  private handleHtmlErrors(dom: DocumentFragment, headers: Headers, url: string) {
     const location = headers.get('location');
     if (location) {
-      throw new RedirectError(location);
+      throw new RedirectError(`${url} -> ${location}`);
     }
 
     // language=CSS
@@ -433,7 +433,7 @@ export class NetworkProxy {
 
     const title = titleElement.attributes.getNamedItem('content').value;
     if (title === 'Free Online Multiplayer Strategy Game | eRepublik') {
-      throw new InvalidErpkError();
+      throw new InvalidErpkError(url);
     }
   }
 
