@@ -2,12 +2,14 @@ import { getLogger } from 'log4js';
 import { AppStatus, StateService } from '../state.service';
 import { ServerNetworkProxy } from './server-network-proxy';
 import { JobStatusRequest } from './_models/job-status-request';
+import { Dispatcher } from '../dispatcher/dispatcher';
 
 const logger = getLogger('Event Reporter');
 
 export class EventReporter {
   constructor(private stateService: StateService,
-              private serverNetworkProxy: ServerNetworkProxy) {
+              private serverNetworkProxy: ServerNetworkProxy,
+              private dispatcher: Dispatcher) {
 
   }
 
@@ -47,7 +49,7 @@ export class EventReporter {
 
       this.stateService.status = AppStatus.FATAL_ERROR;
       this.stateService.statusMessage = `${jobName}: ${this.stringifyError(error)}`;
-      // this.dispatcher.shutdown(); // todo revert this change
+      this.dispatcher.shutdown();
     } catch (e) {
       logger.fatal('!!!!!!!!!!!!!!!!!!!!!!!!! ERROR WHILE REPORTING FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       logger.fatal(e);

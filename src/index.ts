@@ -58,7 +58,7 @@ const serverDispatcher: Dispatcher = startServerDispatcher()
     .init();
 const jobsDispatcher: Dispatcher = getJobsDispatcher()
     .init();
-const eventReporter = new EventReporter(stateService, serverNetworkProxy);
+const eventReporter = new EventReporter(stateService, serverNetworkProxy, jobsDispatcher);
 
 handleSignals([jobsDispatcher, serverDispatcher]);
 
