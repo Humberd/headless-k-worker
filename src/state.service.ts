@@ -15,7 +15,7 @@ export class StateService {
   @log() serverUrl: string = process.env.SERVER_URL;
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
 
-  @log() erpk: string;
+  @log({secure: true}) erpk: string;
   @log({secure: true}) email: string = process.env.EMAIL;
   @log({secure: true}) password: string = process.env.PASSWORD;
   @log({secure: true}) erpk_rm: string = process.env.ERPK_RM; //remember_me token
@@ -69,7 +69,7 @@ export class StateService {
     return this.lastWorkDay === this.currentDay;
   }
 
-  workedOvertimeToday():  boolean {
+  workedOvertimeToday(): boolean {
     return this.lastWorkOvertimeDay === this.currentDay;
   }
 
