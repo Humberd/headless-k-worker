@@ -161,9 +161,7 @@ function getJobsDispatcher(): Dispatcher {
       id: 'train-daily',
       name: 'Train daily',
       timeInterval: time(14, 'minutes'),
-      shouldStopRunning: () => {
-        return stateService.trainedToday();
-      },
+      shouldStopRunning: () => stateService.trainedToday(),
       action: () => trainBridge.trainDaily(),
       afterAction: () => sleep(2000),
     },
@@ -232,7 +230,7 @@ function getJobsDispatcher(): Dispatcher {
       message: eventReporter.stringifyError(error)
     });
 
-    return false;
+    return true;
   });
 
   dispatcher.onSuccess(async (job, jobResponse) => {

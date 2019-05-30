@@ -95,6 +95,7 @@ export class Dispatcher {
       }
 
       this.logger.error('Unhandled Error \n', e);
+      return;
     }
 
     const jobSuccessHandlerResult = await job.handleSuccess(job, jobResponse);
