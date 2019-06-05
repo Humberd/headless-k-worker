@@ -16,9 +16,17 @@ export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function handleErrorMessage(error: Error, desiredMessage: string, action: () => any) {
+export function handleErrorMessage(error: Error, desiredMessages: string | string[], action: () => any) {
+  let messages: string[];
+  if (typeof desiredMessages === 'string') {
+    messages = [desiredMessages];
+  } else {
+    messages = desiredMessages;
+  }
+
+
   if (error instanceof UnknownError) {
-    if (error.body.message === desiredMessage) {
+    if (messages.some(it => it === error.body.message)) {
       return action();
     }
     throw error;
