@@ -20,8 +20,6 @@ spec:
           image: $(Build.Definitionname):$(Build.BuildId)
           imagePullPolicy: Always
           env:
-            - name: ERPK_RM
-              value: $(ERPK_RM)
             - name: EMAIL
               value: $(EREP_EMAIL)
             - name: PASSWORD
