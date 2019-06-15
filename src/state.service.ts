@@ -41,8 +41,8 @@ export class StateService {
 
   @log() userConfig = {
     battleTypePriority: BattleType.AIR,
-    tankPrimaryWeapon: WeaponType.NO_WEAPON,
-    tankSecondaryWeapon: WeaponType.Q7,
+    tankPrimaryWeapon: WeaponType.Q7,
+    tankSecondaryWeapon: WeaponType.NO_WEAPON,
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
 
