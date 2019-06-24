@@ -51,7 +51,7 @@ export class StateService {
     nationalityPriority: Nationality.POLAND,
 
     maxKillsIn1Go: 25, // todo: change after event
-    enableEpicsFinder: true,
+    enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 350,
     minimalNormalFightSecondaryHpPercent: 0.9,
     enableFighting: true
