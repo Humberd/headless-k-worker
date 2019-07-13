@@ -2,6 +2,13 @@
 
 > A browser game bot used to automate periodic tasks.
 
+## Related projects
+
+|||
+|-|-|
+| Mobile app | https://github.com/Humberd/headless-k-client-mobile |
+| Server | https://github.com/Humberd/headless-k-server |
+
 ## Featues:
 
  * Authentication via token or credentials.
