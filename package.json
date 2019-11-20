@@ -10,17 +10,17 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^7.0.0",
-    "jsdom": "^14.0.0",
-    "log4js": "^4.1.0",
-    "node-fetch": "^2.3.0"
+    "jsdom": "^14.1.0",
+    "log4js": "^4.5.1",
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "@types/jsdom": "^12.2.3",
+    "@types/jsdom": "^12.2.4",
     "@types/log4js": "^2.3.5",
-    "@types/node": "^11.11.6",
-    "@types/node-fetch": "^2.3.0",
-    "ts-loader": "^5.3.3",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
+    "@types/node": "^11.15.2",
+    "@types/node-fetch": "^2.5.3",
+    "ts-loader": "^5.4.5",
+    "ts-node": "^8.5.2",
+    "typescript": "^3.7.2"
   }
 }
