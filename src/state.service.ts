@@ -1,4 +1,4 @@
-import { BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
+import { BattleDivision, BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
 import { WeaponType } from './types/change-weapon-request';
 import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
@@ -54,7 +54,9 @@ export class StateService {
     enableEpicsFinder: false,
     minimalEpicFightPrimaryHp: 350,
     minimalNormalFightSecondaryHpPercent: 0.9,
-    enableFighting: true
+    enableFighting: true,
+
+    tankDivision: BattleDivision.DIV_4
   };
 
   calcTimeToFullSecondaryHp(): number {

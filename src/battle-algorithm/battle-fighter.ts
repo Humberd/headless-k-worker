@@ -6,7 +6,7 @@ import { WeeklyChallengeBridge } from '../bridges/weekly-challenge-bridge';
 import { RewardCollectorBridge } from '../bridges/reward-collector.bridge';
 import { TravelBridge } from '../bridges/travel-bridge';
 import { noExceptionExecutor, sleep } from '../utils';
-import { IntensityType } from './battle-analyzer-enums';
+import { BattleType, IntensityType } from './battle-analyzer-enums';
 import { StateService } from '../state.service';
 import { getLogger } from 'log4js';
 import { JobResponse } from '../dispatcher/types';
@@ -57,8 +57,8 @@ export class BattleFighter {
       }
     } = this.stateService;
 
-
-    if (battle.intensityType === IntensityType.EPIC) {
+    if (battle.intensityType === IntensityType.EPIC &&
+        battle.battleType !== BattleType.AIR) {
       if (healthBarPrimary < minimalEpicFightPrimaryHp) {
         logger.info(`Not enough HP for epic. Current: ${healthBarPrimary}. Required: ${minimalEpicFightPrimaryHp}`);
         return false;

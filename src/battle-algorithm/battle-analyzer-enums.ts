@@ -9,6 +9,14 @@ export enum BattleType {
   TANK = 'TANK'
 }
 
+export enum BattleDivision {
+  DIV_1 = 1,
+  DIV_2 = 2,
+  DIV_3 = 3,
+  DIV_4 = 4,
+  AIR = 11
+}
+
 export enum Nationality {
   ROMANIA = 1,
   BRAZIL = 9,

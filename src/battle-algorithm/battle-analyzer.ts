@@ -1,8 +1,6 @@
 import { Battle, Type } from '../types/campains-response';
-import { BattleType, IntensityType, Nationality } from './battle-analyzer-enums';
+import { BattleDivision, BattleType, IntensityType, Nationality } from './battle-analyzer-enums';
 import { StateService } from '../state.service';
-
-const ACTIVE_DIVISION = 4;
 
 export interface BattleAnalysis {
   id: string,
@@ -86,14 +84,14 @@ export class BattleAnalyzer {
   }
 
   private findIntensityType(battle: Battle): IntensityType {
-    // fixme: division from state
-    const currentDivision = ACTIVE_DIVISION;
-
-    const divisionStats = battle.div[currentDivision];
+    const divisionStats = Object.values(battle.div).find(it =>
+        it.div === this.stateService.userConfig.tankDivision ||
+        it.div === BattleDivision.AIR.valueOf(),
+    );
     if (!divisionStats) {
-      // air battle
-      return IntensityType.NORMAL;
+      throw new BattleAnalysisError('Unknown division', battle);
     }
+
     switch (divisionStats.epic) {
       case 2:
         return IntensityType.EPIC;
@@ -101,6 +99,8 @@ export class BattleAnalyzer {
         return IntensityType.FULL_SCALE;
       case 0:
         return IntensityType.NORMAL;
+      default:
+        throw new BattleAnalysisError(`Unknown epic type: ${divisionStats.epic}`, battle)
     }
   }
 
