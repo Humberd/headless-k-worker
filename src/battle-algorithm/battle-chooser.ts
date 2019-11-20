@@ -40,6 +40,10 @@ export class BattleChooser {
   private scoreBattle(battle: BattleAnalysis): number {
     let score = 0;
 
+    if (battle.intensityType === IntensityType.EPIC && battle.battleType === BattleType.AIR) {
+      score += 1 << 10; // todo: remove after 2019 birthday event
+    }
+
     if (battle.intensityType === IntensityType.EPIC && this.stateService.userConfig.enableEpicsFinder) {
       score += 1 << 4;
     }
