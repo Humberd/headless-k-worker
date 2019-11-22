@@ -14,6 +14,7 @@ export class StateService {
   @log() statusMessage: string;
   @log() serverUrl: string = process.env.SERVER_URL;
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
+  @log() serverLoggerEnabled = false;
 
   @log({secure: true}) erpk: string;
   @log({secure: true}) email: string = process.env.EMAIL;
