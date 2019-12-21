@@ -42,7 +42,7 @@ export class StateService {
 
   @log() userConfig = {
     battleTypePriority: BattleType.AIR,
-    tankPrimaryWeapon: WeaponType.Q7,
+    tankPrimaryWeapon: WeaponType.NO_WEAPON,
     tankSecondaryWeapon: WeaponType.NO_WEAPON,
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
@@ -52,8 +52,8 @@ export class StateService {
     nationalityPriority: Nationality.POLAND,
 
     maxKillsIn1Go: 25, // todo: change after event
-    enableEpicsFinder: false,
-    minimalEpicFightPrimaryHp: 350,
+    enableEpicsFinder: true,
+    minimalEpicFightPrimaryHp: 860,
     minimalNormalFightSecondaryHpPercent: 0.9,
     enableFighting: true,
 
