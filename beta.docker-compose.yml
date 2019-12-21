@@ -1,0 +1,7 @@
+version: '3'
+services:
+  worker:
+    image: humberd/headless-k-worker:beta
+    env_file:
+      - .env
+
