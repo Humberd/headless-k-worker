@@ -75,7 +75,7 @@ export class BattleBridge {
     }
   }
 
-  @phase('Snow Fight effect')
+  @phase('Activate Snow Fight effect')
   async activateSnowFightEffect(battleId: string,) {
     try {
       return await this.networkProxy.activateBattleEffect({
