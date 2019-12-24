@@ -67,6 +67,12 @@ export class BattleFighter {
       return true;
     }
 
+    /* We only want to fight when the secondary health bar is full */
+    if (healthBarSecondary === 0) {
+      logger.info('Not enough secondary HP. Current: 0');
+      return false;
+    }
+
     /* healthBarPrimary is now our full max health  */
     const minHp = healthBarPrimary * minimalNormalFightSecondaryHpPercent;
     if (minHp > healthBarSecondary) {
@@ -88,14 +94,6 @@ export class BattleFighter {
 
     if (config.divisionSwitch) {
       await this.battleBridge.switchDivision(config.battleId, config.sideId, config.battleNumber, config.divisionSwitch)
-    }
-
-    if (config.usePrestigePointsBooster) {
-      await this.battleBridge.activatePrestigePointsBooster(config.battleId, config.sideId, config.battleNumber)
-    }
-
-    if (config.useSnowFightEffect) {
-      await this.battleBridge.activateSnowFightEffect(config.battleId)
     }
 
     try {
