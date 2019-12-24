@@ -67,12 +67,6 @@ export class BattleFighter {
       return true;
     }
 
-    /* We only want to fight when the secondary health bar is full */
-    if (healthBarSecondary === 0) {
-      logger.info('Not enough secondary HP. Current: 0');
-      return false;
-    }
-
     /* healthBarPrimary is now our full max health  */
     const minHp = healthBarPrimary * minimalNormalFightSecondaryHpPercent;
     if (minHp > healthBarSecondary) {
