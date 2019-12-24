@@ -1,7 +1,9 @@
 import { BattleDivision, BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
 import { WeaponType } from './types/change-weapon-request';
-import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
+import { BattleEqualRankDecision } from './battle-algorithm/decisions/battle-equal-rank-decision';
+import { PrestigePointsBoosterDecision } from './battle-algorithm/decisions/prestige-points-booster-decision';
+import { SnowFightEffectDecisions } from './battle-algorithm/decisions/snow-fight-effect-decisions';
 
 export enum AppStatus {
   OK = 'OK',
@@ -14,6 +16,7 @@ export class StateService {
   @log() statusMessage: string;
   @log() serverUrl: string = process.env.SERVER_URL;
   @log({secure: true}) serverToken: string = process.env.SERVER_TOKEN;
+  @log() serverLoggerEnabled = false;
 
   @log({secure: true}) erpk: string;
   @log({secure: true}) email: string = process.env.EMAIL;
@@ -41,7 +44,7 @@ export class StateService {
 
   @log() userConfig = {
     battleTypePriority: BattleType.AIR,
-    tankPrimaryWeapon: WeaponType.Q7,
+    tankPrimaryWeapon: WeaponType.NO_WEAPON,
     tankSecondaryWeapon: WeaponType.NO_WEAPON,
     airPrimaryWeapon: WeaponType.NO_WEAPON,
     airSecondaryWeapon: WeaponType.NO_WEAPON,
@@ -51,12 +54,15 @@ export class StateService {
     nationalityPriority: Nationality.POLAND,
 
     maxKillsIn1Go: 25, // todo: change after event
-    enableEpicsFinder: false,
-    minimalEpicFightPrimaryHp: 350,
+    enableEpicsFinder: true,
+    minimalEpicFightPrimaryHp: 970,
     minimalNormalFightSecondaryHpPercent: 0.9,
     enableFighting: true,
 
-    tankDivision: BattleDivision.DIV_4
+    tankDivision: BattleDivision.DIV_4,
+
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL,
+    activateSnowFightEffect: SnowFightEffectDecisions.ALL,
   };
 
   calcTimeToFullSecondaryHp(): number {

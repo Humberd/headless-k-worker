@@ -5,7 +5,7 @@ import {
   NetworkProxy,
   RateLimitError,
   UnknownError,
-  WeaponNotChangedError
+  WeaponNotChangedError,
 } from '../network-proxy';
 import { StateService } from '../state.service';
 import { AttackResponse } from '../types/attack-response';
@@ -15,6 +15,7 @@ import { BattleType } from '../battle-algorithm/battle-analyzer-enums';
 import { phase, sleep } from '../utils';
 import { getLogger } from 'log4js';
 import { WeaponType } from '../types/change-weapon-request';
+import { PerstigePointsBooster3MinRequest } from '../types/activate-booster-request';
 
 export interface AttackConfig {
   battleId: string;
@@ -24,7 +25,9 @@ export interface AttackConfig {
   requiresTravel: boolean;
   skipTravelBack?: boolean;
   divisionSwitch?: number;
-  battleNumber?: number;
+  battleNumber?: number; // zoneId
+  usePrestigePointsBooster: boolean;
+  useSnowFightEffect: boolean;
 }
 
 const logger = getLogger('BattleBridge');
@@ -55,6 +58,36 @@ export class BattleBridge {
     });
 
     return response;
+  }
+
+  @phase('Activate Prestige Points Booster')
+  async activatePrestigePointsBooster(battleId: string, sideId: string, zoneId: number) {
+    try {
+      return await this.networkProxy.activateBooster(new PerstigePointsBooster3MinRequest(
+          battleId,
+          zoneId,
+          sideId,
+      ));
+    } catch (e) {
+      logger.warn('Prestige Points booster cannot be activated');
+      logger.warn(e);
+      return;
+    }
+  }
+
+  @phase('Activate Snow Fight effect')
+  async activateSnowFightEffect(battleId: string,) {
+    try {
+      return await this.networkProxy.activateBattleEffect({
+        battleId: battleId,
+        type: 'snowFight',
+        citizenId: this.stateService.userId
+      })
+    } catch (e) {
+      logger.warn('Snow Fight effect cannot be activated');
+      logger.warn(e);
+      return;
+    }
   }
 
   @phase('Choose battle side')

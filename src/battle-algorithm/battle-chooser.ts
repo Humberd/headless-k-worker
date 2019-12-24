@@ -3,7 +3,7 @@ import { BattleType, IntensityType } from './battle-analyzer-enums';
 import { StateService } from '../state.service';
 import { getLogger } from 'log4js';
 import { BattleStatsResponse } from '../types/battle-stats-response';
-import { BattleEqualRankDecision } from './battle-equal-rank-decision';
+import { BattleEqualRankDecision } from './decisions/battle-equal-rank-decision';
 import { BattleBridge } from '../bridges/battle-bridge';
 
 const logger = getLogger('BattleChooser');

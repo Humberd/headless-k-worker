@@ -10,7 +10,8 @@ export interface Boosters {
 }
 
 export interface BoostersActive {
-  damageBoosters: ActiveDamageBoosters;
+  damageBoosters?: ActiveDamageBoosters;
+  prestigePointsBoosters?: any
 }
 
 export interface ActiveDamageBoosters {

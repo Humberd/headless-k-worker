@@ -14,6 +14,10 @@ export class EventReporter {
   }
 
   async reportWorkerStatus() {
+    if (!this.stateService.serverLoggerEnabled) {
+      return;
+    }
+
     return await this.safeResponse(this.serverNetworkProxy.reportWorkerStatus({
       status: this.stateService.status,
       version: this.stateService.version,
@@ -22,6 +26,10 @@ export class EventReporter {
   }
 
   async reportJobStatus(status: JobStatusRequest) {
+    if (!this.stateService.serverLoggerEnabled) {
+      return;
+    }
+
     return await this.safeResponse(this.serverNetworkProxy.reportJobStatus(status))
   }
 

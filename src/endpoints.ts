@@ -31,6 +31,8 @@ import { EnergyDataResponse } from './types/energy-data-response';
 import { LoginCredentialsRequest } from './types/login-credentials-request';
 import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
+import { ActivateBattleEffectRequest } from './types/activate-battle-effect-request';
+import { ActivateBattleEffectResponse } from './types/activate-battle-effect-response';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -131,8 +133,20 @@ export async function eat(erpk: string, _token: string) {
   });
 }
 
-export async function activateBooster(formData: ActivateBoosterRequest) {
-  return request<ActivateBoosterResponse>(`https://www.erepublik.com/en/military/fight-activateBooster`);
+export async function activateBooster(erpk: string, formData: ActivateBoosterRequest) {
+  return request<ActivateBoosterResponse>(`https://www.erepublik.com/en/military/fight-activateBooster`,{
+    body: formData,
+    method: 'POST',
+    erpk: erpk
+  });
+}
+
+export async function activateBattleEffect(erpk: string, formData: ActivateBattleEffectRequest) {
+  return request<ActivateBattleEffectResponse>(`https://www.erepublik.com/en/main/fight-activateBattleEffect`, {
+    body: formData,
+    method: 'POST',
+    erpk: erpk
+  })
 }
 
 export async function work(erpk: string, formData: WorkRequest) {
