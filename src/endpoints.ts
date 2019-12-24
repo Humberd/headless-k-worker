@@ -131,8 +131,12 @@ export async function eat(erpk: string, _token: string) {
   });
 }
 
-export async function activateBooster(formData: ActivateBoosterRequest) {
-  return request<ActivateBoosterResponse>(`https://www.erepublik.com/en/military/fight-activateBooster`);
+export async function activateBooster(erpk: string, formData: ActivateBoosterRequest) {
+  return request<ActivateBoosterResponse>(`https://www.erepublik.com/en/military/fight-activateBooster`,{
+    body: formData,
+    method: 'POST',
+    erpk: erpk
+  });
 }
 
 export async function work(erpk: string, formData: WorkRequest) {

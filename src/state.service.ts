@@ -2,6 +2,7 @@ import { BattleDivision, BattleType, Nationality } from './battle-algorithm/batt
 import { log, time } from './utils';
 import { WeaponType } from './types/change-weapon-request';
 import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
+import { PrestigePointsBoosterDecision } from './battle-algorithm/prestige-points-booster-decision';
 
 export enum AppStatus {
   OK = 'OK',
@@ -53,11 +54,13 @@ export class StateService {
 
     maxKillsIn1Go: 25, // todo: change after event
     enableEpicsFinder: true,
-    minimalEpicFightPrimaryHp: 860,
+    minimalEpicFightPrimaryHp: 970,
     minimalNormalFightSecondaryHpPercent: 0.9,
     enableFighting: true,
 
-    tankDivision: BattleDivision.DIV_4
+    tankDivision: BattleDivision.DIV_4,
+
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL
   };
 
   calcTimeToFullSecondaryHp(): number {

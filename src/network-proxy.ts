@@ -1,4 +1,5 @@
 import {
+  activateBooster,
   attackAir,
   attackTank,
   buyGold,
@@ -25,7 +26,7 @@ import {
   TypedResponse,
   work,
   workOvertime,
-  workProduction
+  workProduction,
 } from './endpoints';
 import { BuyGoldRequest } from './types/buy-gold-request';
 import { Headers } from 'node-fetch';
@@ -39,6 +40,7 @@ import { ChangeWeaponRequest } from './types/change-weapon-request';
 import { LoginCredentialsRequest } from './types/login-credentials-request';
 import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
+import { ActivateBoosterRequest } from './types/activate-booster-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -305,6 +307,13 @@ export class NetworkProxy {
       ...formData,
       _token: this._token
     }));
+  }
+
+  async activateBooster(formData: ActivateBoosterRequest) {
+    return this.jsonResponseHandler(activateBooster(this.erpk, {
+      ...formData,
+      _token: this._token
+    }))
   }
 
 

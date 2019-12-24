@@ -78,7 +78,8 @@ export class TokenHunterJob implements DispatchJob {
           requiresTravel: this.battleAnalyzer.requiresTravelFor(bat.battle, bat.sideId),
           skipTravelBack: true,
           divisionSwitch: this.DIVISION,
-          battleNumber: this.getBattleNumber(bat.details)
+          battleNumber: this.getBattleNumber(bat.details),
+          usePrestigePointsBooster: false
         };
         logger.info(attackConfig);
 

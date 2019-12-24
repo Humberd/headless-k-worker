@@ -3,6 +3,7 @@ import { BattleAnalysis } from './battle-analyzer';
 import { AttackConfig } from '../bridges/battle-bridge';
 import { IntensityType } from './battle-analyzer-enums';
 import { getLogger } from 'log4js';
+import { PrestigePointsBoosterDecision } from './prestige-points-booster-decision';
 
 const logger = getLogger('AttackConfigChooser');
 
@@ -17,7 +18,8 @@ export class AttackConfigChooser {
       sideId: this.getSideId(battle),
       battleType: battle.battleType,
       killsLimit: this.getKillsLimit(battle),
-      requiresTravel: this.getRequiresTravel(battle)
+      requiresTravel: this.getRequiresTravel(battle),
+      usePrestigePointsBooster: this.shouldUsePrestigePointsBooster(battle)
     };
   }
 
@@ -60,5 +62,20 @@ export class AttackConfigChooser {
 
   private getRequiresTravel(battle: BattleAnalysis) {
     return !battle.requiresTravel.includes(false);
+  }
+
+  private shouldUsePrestigePointsBooster(battle: BattleAnalysis): boolean {
+    const activationConfig = this.stateService.userConfig.activatePrestigePointsBooster;
+    switch (activationConfig) {
+      case PrestigePointsBoosterDecision.EPIC_ONLY:
+        return battle.intensityType === IntensityType.EPIC;
+      case PrestigePointsBoosterDecision.ALL:
+        return true;
+      case PrestigePointsBoosterDecision.OFF:
+        return false;
+      default:
+        throw new Error(`Prestige Points booster activation type is not handled: ${activationConfig}`)
+    }
+
   }
 }
