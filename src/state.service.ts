@@ -1,8 +1,9 @@
 import { BattleDivision, BattleType, Nationality } from './battle-algorithm/battle-analyzer-enums';
 import { log, time } from './utils';
 import { WeaponType } from './types/change-weapon-request';
-import { BattleEqualRankDecision } from './battle-algorithm/battle-equal-rank-decision';
-import { PrestigePointsBoosterDecision } from './battle-algorithm/prestige-points-booster-decision';
+import { BattleEqualRankDecision } from './battle-algorithm/decisions/battle-equal-rank-decision';
+import { PrestigePointsBoosterDecision } from './battle-algorithm/decisions/prestige-points-booster-decision';
+import { SnowFightEffectDecisions } from './battle-algorithm/decisions/snow-fight-effect-decisions';
 
 export enum AppStatus {
   OK = 'OK',
@@ -60,7 +61,8 @@ export class StateService {
 
     tankDivision: BattleDivision.DIV_4,
 
-    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL,
+    activateSnowFightEffect: SnowFightEffectDecisions.ALL,
   };
 
   calcTimeToFullSecondaryHp(): number {

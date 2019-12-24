@@ -3,7 +3,8 @@ import { BattleAnalysis } from './battle-analyzer';
 import { AttackConfig } from '../bridges/battle-bridge';
 import { IntensityType } from './battle-analyzer-enums';
 import { getLogger } from 'log4js';
-import { PrestigePointsBoosterDecision } from './prestige-points-booster-decision';
+import { PrestigePointsBoosterDecision } from './decisions/prestige-points-booster-decision';
+import { SnowFightEffectDecisions } from './decisions/snow-fight-effect-decisions';
 
 const logger = getLogger('AttackConfigChooser');
 
@@ -19,7 +20,8 @@ export class AttackConfigChooser {
       battleType: battle.battleType,
       killsLimit: this.getKillsLimit(battle),
       requiresTravel: this.getRequiresTravel(battle),
-      usePrestigePointsBooster: this.shouldUsePrestigePointsBooster(battle)
+      usePrestigePointsBooster: this.shouldUsePrestigePointsBooster(battle),
+      useSnowFightEffect: this.shouldUseSnowFightEffect(battle)
     };
   }
 
@@ -77,5 +79,19 @@ export class AttackConfigChooser {
         throw new Error(`Prestige Points booster activation type is not handled: ${activationConfig}`)
     }
 
+  }
+
+  private shouldUseSnowFightEffect(battle: BattleAnalysis) {
+    const activationConfig = this.stateService.userConfig.activateSnowFightEffect;
+    switch (activationConfig) {
+      case SnowFightEffectDecisions.EPIC_ONLY:
+        return battle.intensityType === IntensityType.EPIC;
+      case SnowFightEffectDecisions.ALL:
+        return true;
+      case SnowFightEffectDecisions.OFF:
+        return false;
+      default:
+        throw new Error(`Snow Fight effect activation type is not handled: ${activationConfig}`)
+    }
   }
 }

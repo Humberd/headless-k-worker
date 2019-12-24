@@ -1,4 +1,5 @@
 import {
+  activateBattleEffect,
   activateBooster,
   attackAir,
   attackTank,
@@ -41,6 +42,7 @@ import { LoginCredentialsRequest } from './types/login-credentials-request';
 import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
 import { ActivateBoosterRequest } from './types/activate-booster-request';
+import { ActivateBattleEffectRequest } from './types/activate-battle-effect-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -311,6 +313,13 @@ export class NetworkProxy {
 
   async activateBooster(formData: ActivateBoosterRequest) {
     return this.jsonResponseHandler(activateBooster(this.erpk, {
+      ...formData,
+      _token: this._token
+    }))
+  }
+
+  async activateBattleEffect(formData: ActivateBattleEffectRequest) {
+    return this.jsonResponseHandler(activateBattleEffect(this.erpk, {
       ...formData,
       _token: this._token
     }))
