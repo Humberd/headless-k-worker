@@ -27,6 +27,7 @@ variables:
 
 steps:
   - script:
+      export DOCKER_BUILDKIT=1
       git clone git://github.com/docker/buildx && cd buildx;
       make install;
       docker buildx version;
