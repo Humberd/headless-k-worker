@@ -33,7 +33,7 @@ steps:
       docker buildx build \
         -t $(DOCKER_LOGIN)/$(taggedImage) \
         -t $(DOCKER_LOGIN)/$(taggedImageLatest) \
-        --platform $(buildPlatforms)
+        --platform $(buildPlatforms) \
         --build-arg BUILD_ID=$(BUILD_ID) \
         . --push
     displayName: 'docker build'
