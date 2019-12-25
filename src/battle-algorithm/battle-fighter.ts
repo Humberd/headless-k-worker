@@ -96,6 +96,14 @@ export class BattleFighter {
       await this.battleBridge.switchDivision(config.battleId, config.sideId, config.battleNumber, config.divisionSwitch)
     }
 
+    if (config.usePrestigePointsBooster) {
+      await this.battleBridge.activatePrestigePointsBooster(config.battleId, config.sideId, config.battleNumber);
+    }
+
+    if (config.useSnowFightEffect) {
+      await this.battleBridge.activateSnowFightEffect(config.battleId);
+    }
+
     try {
       return await this.battleBridge.startAttacking(config);
     } finally {
