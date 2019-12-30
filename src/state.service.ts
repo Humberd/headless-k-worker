@@ -53,7 +53,7 @@ export class StateService {
 
     nationalityPriority: Nationality.POLAND,
 
-    maxKillsIn1Go: 150, // todo: change after event
+    maxKillsIn1Go: 25, // todo: change after event
     enableEpicsFinder: true,
     minimalEpicFightPrimaryHp: 970,
     minimalNormalFightSecondaryHpPercent: 0.9,
@@ -61,8 +61,8 @@ export class StateService {
 
     tankDivision: BattleDivision.DIV_4,
 
-    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL,
-    activateSnowFightEffect: SnowFightEffectDecisions.ALL,
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.OFF,
+    activateSnowFightEffect: SnowFightEffectDecisions.OFF,
   };
 
   calcTimeToFullSecondaryHp(): number {
