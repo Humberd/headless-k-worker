@@ -61,8 +61,8 @@ export class StateService {
 
     tankDivision: BattleDivision.DIV_4,
 
-    activatePrestigePointsBooster: PrestigePointsBoosterDecision.OFF,
-    activateSnowFightEffect: SnowFightEffectDecisions.OFF,
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL,
+    activateSnowFightEffect: SnowFightEffectDecisions.ALL,
   };
 
   calcTimeToFullSecondaryHp(): number {
