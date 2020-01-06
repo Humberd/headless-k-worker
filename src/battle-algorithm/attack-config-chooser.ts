@@ -72,7 +72,8 @@ export class AttackConfigChooser {
       case PrestigePointsBoosterDecision.EPIC_ONLY:
         return battle.intensityType === IntensityType.EPIC;
       case PrestigePointsBoosterDecision.ALL:
-        return true;
+        /* We do like 2 kills when waiting for the EPIC battle, so we don't need to activate a booster yet */
+        return battle.intensityType !== IntensityType.FULL_SCALE;
       case PrestigePointsBoosterDecision.OFF:
         return false;
       default:
@@ -87,7 +88,8 @@ export class AttackConfigChooser {
       case SnowFightEffectDecisions.EPIC_ONLY:
         return battle.intensityType === IntensityType.EPIC;
       case SnowFightEffectDecisions.ALL:
-        return true;
+        /* We do like 2 kills when waiting for the EPIC battle, so we don't need to activate a booster yet */
+        return battle.intensityType !== IntensityType.FULL_SCALE;
       case SnowFightEffectDecisions.OFF:
         return false;
       default:
