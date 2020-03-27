@@ -45,6 +45,7 @@ export class ExchangeMarketBridge {
     } catch (e) {
       return handleErrorMessage(e, [
         'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You cannot buy more than 0 Gold at this point.',
+        'Citizens cannot acquire more than 50 Gold per day through Monetary Market and Donations. You cannot buy more than 0 Gold at this point.',
         'Citizens cannot acquire more than 10 Gold per day through Monetary Market and Donations. You already reached the maximum limit.'
       ], () => {
         logger.info('Already bought Gold today');
