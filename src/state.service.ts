@@ -61,7 +61,7 @@ export class StateService {
 
     tankDivision: BattleDivision.DIV_4,
 
-    activatePrestigePointsBooster: PrestigePointsBoosterDecision.ALL,
+    activatePrestigePointsBooster: PrestigePointsBoosterDecision.OFF,
     activateSnowFightEffect: SnowFightEffectDecisions.OFF,
   };
 
