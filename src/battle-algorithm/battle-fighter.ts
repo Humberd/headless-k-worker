@@ -28,7 +28,7 @@ export class BattleFighter {
   async tryFight(): Promise<JobResponse> {
     if (!this.stateService.userConfig.enableFighting) {
       logger.info('Fighting has not been enabled.');
-      return;
+      return JobResponse.alreadyDone('Conditions were not met');
     }
 
     const battles = await this.battleBridge.getBattles();
