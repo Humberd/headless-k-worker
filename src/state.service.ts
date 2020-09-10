@@ -57,7 +57,7 @@ export class StateService {
     enableEpicsFinder: true,
     minimalEpicFightPrimaryHp: 970,
     minimalNormalFightSecondaryHpPercent: 0.9,
-    enableFighting: false,
+    enableFighting: true,
 
     tankDivision: BattleDivision.DIV_4,
 
