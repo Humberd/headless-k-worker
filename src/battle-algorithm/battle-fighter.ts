@@ -51,6 +51,7 @@ export class BattleFighter {
     const {
       healthBarPrimary,
       healthBarSecondary,
+      healthBarLimit,
       userConfig: {
         minimalNormalFightSecondaryHpPercent,
         minimalEpicFightPrimaryHp
@@ -73,7 +74,7 @@ export class BattleFighter {
     }
 
     /* healthBarPrimary is now our full max health  */
-    const minHp = healthBarPrimary * minimalNormalFightSecondaryHpPercent;
+    const minHp = healthBarLimit * minimalNormalFightSecondaryHpPercent;
     if (minHp > healthBarSecondary) {
       logger.info(`Not enough secondary HP. Current: ${healthBarSecondary}. Required: ${minHp}`);
       return false;

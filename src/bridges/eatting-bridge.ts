@@ -23,7 +23,7 @@ export class EattingBridge {
     this.stateService.healthBarPrimary = newHpPrim;
     this.stateService.healthBarSecondary = newHpSec;
 
-    logger.info(`Eatting result: (${oldHpPrim}+${oldHpSec}) -> (${newHpPrim}+${newHpSec})`);
+    logger.info(`Eating result: (${oldHpPrim}+${oldHpSec}) -> (${newHpPrim}+${newHpSec})`);
   }
 
   @phase('Refresh energy data')
