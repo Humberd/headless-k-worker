@@ -58,8 +58,6 @@ export class BattleFighter {
       }
     } = this.stateService;
 
-    return true;
-
     if (battle.intensityType === IntensityType.EPIC) {
       if (healthBarPrimary < minimalEpicFightPrimaryHp) {
         logger.info(`Not enough HP for epic. Current: ${healthBarPrimary}. Required: ${minimalEpicFightPrimaryHp}`);

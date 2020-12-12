@@ -101,84 +101,83 @@ function getJobsDispatcher(): Dispatcher {
         return true;
       }
     },
-    // {
-    //   id: 'work-daily',
-    //   name: 'Work daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work overtime checker');
-    //     if (stateService.workedToday()) {
-    //       logger.info('Already worked');
-    //       return true;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   action: () => workBridge.workDaily(),
-    //   afterAction: () => sleep(2000)
-    // },
-    // {
-    //   id: 'work-overtime-daily',
-    //   name: 'Work overtime daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work overtime checker');
-    //     if (stateService.workedOvertimeToday()) {
-    //       logger.info('Already worked today');
-    //       return true;
-    //     }
-    //     return false;
-    //   },
-    //   action: () => workBridge.workOvertimeDaily(),
-    //   afterAction: () => sleep(2000)
-    // },
-    // {
-    //   id: 'work-production-daily',
-    //   name: 'Work production daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     const logger = getLogger('Work Production checker');
-    //     if (stateService.workedProductionToday()) {
-    //       logger.info('Already worked today');
-    //       return true;
-    //     }
-    //
-    //     /* We are not running production, because it uses too much hp, which we will use on fighting in epics.
-    //     * Try work production 6 hours after day start */
-    //     if (stateService.isWcStartDay() &&
-    //         !stateService.dayTimeElapsed(time(6, 'hours'))) {
-    //       logger.info('Not working. Must elapse at least 6 hours in wc start day.');
-    //       // return true;
-    //       return false;
-    //     }
-    //
-    //     return false;
-    //   },
-    //   action: () => workBridge.workProductionDaily(),
-    //   afterAction: () => sleep(2000),
-    // },
-    // {
-    //   id: 'train-daily',
-    //   name: 'Train daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => stateService.trainedToday(),
-    //   action: () => trainBridge.trainDaily(),
-    //   afterAction: () => sleep(2000),
-    // },
-    // {
-    //   id: 'buy-gold-daily',
-    //   name: 'Buy Gold daily',
-    //   timeInterval: time(14, 'minutes'),
-    //   shouldStopRunning: () => {
-    //     return true
-    //     // return stateService.boughtGoldToday();
-    //   },
-    //   action: () => exchangeMarketBridge.buyDailyGold(),
-    //   handleError: async (job, error) => {
-    //     await eventReporter.reportFatalError(job.id, job.name, error);
-    //     return true;
-    //   }
-    // },
+    {
+      id: 'work-daily',
+      name: 'Work daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedToday()) {
+          logger.info('Already worked');
+          return true;
+        }
+
+        return false;
+      },
+      action: () => workBridge.workDaily(),
+      afterAction: () => sleep(2000)
+    },
+    {
+      id: 'work-overtime-daily',
+      name: 'Work overtime daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work overtime checker');
+        if (stateService.workedOvertimeToday()) {
+          logger.info('Already worked today');
+          return true;
+        }
+        return false;
+      },
+      action: () => workBridge.workOvertimeDaily(),
+      afterAction: () => sleep(2000)
+    },
+    {
+      id: 'work-production-daily',
+      name: 'Work production daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        const logger = getLogger('Work Production checker');
+        if (stateService.workedProductionToday()) {
+          logger.info('Already worked today');
+          return true;
+        }
+
+        /* We are not running production, because it uses too much hp, which we will use on fighting in epics.
+        * Try work production 6 hours after day start */
+        if (stateService.isWcStartDay() &&
+            !stateService.dayTimeElapsed(time(6, 'hours'))) {
+          logger.info('Not working. Must elapse at least 6 hours in wc start day.');
+          // return true;
+          return false;
+        }
+
+        return false;
+      },
+      action: () => workBridge.workProductionDaily(),
+      afterAction: () => sleep(2000),
+    },
+    {
+      id: 'train-daily',
+      name: 'Train daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => stateService.trainedToday(),
+      action: () => trainBridge.trainDaily(),
+      afterAction: () => sleep(2000),
+    },
+    {
+      id: 'buy-gold-daily',
+      name: 'Buy Gold daily',
+      timeInterval: time(14, 'minutes'),
+      shouldStopRunning: () => {
+        return stateService.boughtGoldToday();
+      },
+      action: () => exchangeMarketBridge.buyDailyGold(),
+      handleError: async (job, error) => {
+        await eventReporter.reportFatalError(job.id, job.name, error);
+        return true;
+      }
+    },
     {
       id: 'fighting',
       name: 'Fight',
