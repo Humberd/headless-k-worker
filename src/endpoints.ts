@@ -89,7 +89,10 @@ export async function getProfile(erpk: string, userId: string) {
 
 export async function updateProfile(erpk: string, formData: ProfileUpdateRequest) {
   return request<ProfileUpdateResponse>(`https://www.erepublik.com/en/main/profile-update`, {
-    body: formData,
+    body: {
+      ...formData,
+      params: JSON.stringify(formData.params)
+    },
     method: 'POST',
     erpk: erpk
   })

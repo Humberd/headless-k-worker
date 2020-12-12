@@ -74,7 +74,6 @@ export class BattleBridge {
       return response
     } catch (e) {
       console.error(e);
-      debugger
       throw e;
     }
   }
