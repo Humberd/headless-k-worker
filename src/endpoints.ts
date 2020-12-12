@@ -56,7 +56,7 @@ async function request<T>(url: string, config?: JsonRequestConfig): Promise<Type
     headers: {
       cookie: cookies,
       'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
     },
     body: config.body ? new URLSearchParams(config.body).toString() : null,
     redirect: 'manual'
