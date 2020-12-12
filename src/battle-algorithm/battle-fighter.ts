@@ -43,7 +43,13 @@ export class BattleFighter {
       return JobResponse.alreadyDone('Conditions were not met');
     }
 
-    await this.fight(attackConfig);
+    try {
+      await this.fight(attackConfig);
+    } catch (e) {
+      await this.onFightError(attackConfig.requiresTravel)
+      throw e;
+    }
+
     return JobResponse.success();
   }
 
@@ -84,6 +90,8 @@ export class BattleFighter {
   }
 
   async fight(config: AttackConfig) {
+    await this.battleBridge.turnOnManualDeployment();
+
     await this.battleBridge.chooseBattleSide(config.battleId, config.sideId);
 
     if (config.requiresTravel) {
@@ -135,6 +143,12 @@ export class BattleFighter {
     }
 
     throw errors[0];
+  }
+
+  private async onFightError(requiresTravelHome: boolean) {
+    if (requiresTravelHome) {
+      await this.travelBridge.travelHome()
+    }
   }
 
 }
