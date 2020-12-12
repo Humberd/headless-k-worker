@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "module": "commonjs",
     "target": "es2017",
-    "lib": ["es2018"],
+    "lib": ["es2018", "DOM"],
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
