@@ -24,7 +24,7 @@ import {
   switchDivision,
   train,
   travel,
-  TypedResponse,
+  TypedResponse, updateProfile,
   work,
   workOvertime,
   workProduction,
@@ -43,6 +43,7 @@ import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
 import { ActivateBoosterRequest } from './types/activate-booster-request';
 import { ActivateBattleEffectRequest } from './types/activate-battle-effect-request';
+import { ProfileUpdateRequest } from './types/profile-update-request';
 
 const logger = getLogger('NetworkProxy');
 
@@ -235,8 +236,15 @@ export class NetworkProxy {
     throw new UnknownError(`Status: ${response.status}, Payload: ${await response.text()}`);
   }
 
-  async getProfile(userId: string) {
+  async profileRead(userId: string) {
     return await this.jsonResponseHandler(getProfile(this.erpk, userId));
+  }
+
+  async profileUpdate(formData: ProfileUpdateRequest) {
+    return await this.jsonResponseHandler(updateProfile(this.erpk, {
+      ...formData,
+      _token: this._token
+    }))
   }
 
   async collectDailyOrderReward() {

@@ -58,6 +58,8 @@ export class BattleFighter {
       }
     } = this.stateService;
 
+    return true;
+
     if (battle.intensityType === IntensityType.EPIC) {
       if (healthBarPrimary < minimalEpicFightPrimaryHp) {
         logger.info(`Not enough HP for epic. Current: ${healthBarPrimary}. Required: ${minimalEpicFightPrimaryHp}`);
@@ -84,6 +86,8 @@ export class BattleFighter {
   }
 
   async fight(config: AttackConfig) {
+    await this.battleBridge.turnOnManualDeployment();
+
     await this.battleBridge.chooseBattleSide(config.battleId, config.sideId);
 
     if (config.requiresTravel) {

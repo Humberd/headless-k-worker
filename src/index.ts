@@ -170,7 +170,8 @@ function getJobsDispatcher(): Dispatcher {
       name: 'Buy Gold daily',
       timeInterval: time(14, 'minutes'),
       shouldStopRunning: () => {
-        return stateService.boughtGoldToday();
+        return true
+        // return stateService.boughtGoldToday();
       },
       action: () => exchangeMarketBridge.buyDailyGold(),
       handleError: async (job, error) => {

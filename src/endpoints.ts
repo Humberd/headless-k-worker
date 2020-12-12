@@ -33,6 +33,8 @@ import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
 import { ActivateBattleEffectRequest } from './types/activate-battle-effect-request';
 import { ActivateBattleEffectResponse } from './types/activate-battle-effect-response';
+import { ProfileUpdateRequest } from './types/profile-update-request';
+import { ProfileUpdateResponse } from './types/profile-update-response';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -83,6 +85,14 @@ export async function getProfile(erpk: string, userId: string) {
     method: 'GET',
     erpk: erpk
   });
+}
+
+export async function updateProfile(erpk: string, formData: ProfileUpdateRequest) {
+  return request<ProfileUpdateResponse>(`https://www.erepublik.com/en/main/profile-update`, {
+    body: formData,
+    method: 'POST',
+    erpk: erpk
+  })
 }
 
 export async function getCampaignsList(erpk: string) {
