@@ -47,6 +47,7 @@ export class BattleFighter {
       await this.fight(attackConfig);
     } catch (e) {
       await this.onFightError(attackConfig.requiresTravel)
+      throw e;
     }
 
     return JobResponse.success();
