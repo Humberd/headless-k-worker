@@ -43,7 +43,12 @@ export class BattleFighter {
       return JobResponse.alreadyDone('Conditions were not met');
     }
 
-    await this.fight(attackConfig);
+    try {
+      await this.fight(attackConfig);
+    } catch (e) {
+      await this.onFightError(attackConfig.requiresTravel)
+    }
+
     return JobResponse.success();
   }
 
@@ -137,6 +142,12 @@ export class BattleFighter {
     }
 
     throw errors[0];
+  }
+
+  private async onFightError(requiresTravelHome: boolean) {
+    if (requiresTravelHome) {
+      await this.travelBridge.travelHome()
+    }
   }
 
 }
