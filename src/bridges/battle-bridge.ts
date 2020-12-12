@@ -60,24 +60,6 @@ export class BattleBridge {
     return response;
   }
 
-  @phase('Turn on manual deployment')
-  async turnOnManualDeployment() {
-    try {
-      const response = await this.networkProxy.profileUpdate({
-        action: 'options',
-        params: {
-          optionName: 'enable_web_deploy',
-          optionValue: 'off'
-        }
-      })
-
-      return response
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  }
-
   @phase('Activate Prestige Points Booster')
   async activatePrestigePointsBooster(battleId: string, sideId: string, zoneId: number) {
     try {
