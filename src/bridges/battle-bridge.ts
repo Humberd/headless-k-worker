@@ -220,7 +220,7 @@ export class BattleBridge {
   private async eat() {
     /* It would not restore health when eatting immediately after attacking */
     await sleep(2000);
-    return await this.eattingBridge.eatMobile();
+    return await this.eattingBridge.eat();
   }
 
   private async attackTank(battleId: string, sideId: string) {
