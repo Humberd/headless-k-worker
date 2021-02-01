@@ -96,8 +96,12 @@ function getJobsDispatcher(): Dispatcher {
          * throws 400 when beforehand we fetched list of campaigns from /en/military/campaigns-new/
          *
          * WTF?!!
+         *
+         * It appears that after that the token totally broken for those requests, so we
+         * would have to request a new one
          */
         // await eattingBridge.refreshEnergyData();
+
         await eattingBridge.eat();
         return JobResponse.success();
       },
