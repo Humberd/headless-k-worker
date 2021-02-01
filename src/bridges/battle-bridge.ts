@@ -9,7 +9,7 @@ import {
 } from '../network-proxy';
 import { StateService } from '../state.service';
 import { AttackResponse } from '../types/attack-response';
-import { EattingBridge } from './eatting-bridge';
+import { EatingBridge } from './eating-bridge';
 import { Battle } from '../types/campains-response';
 import { BattleType } from '../battle-algorithm/battle-analyzer-enums';
 import { phase, sleep } from '../utils';
@@ -37,7 +37,7 @@ export class BattleBridge {
 
   constructor(private networkProxy: NetworkProxy,
               private stateService: StateService,
-              private eattingBridge: EattingBridge) {
+              private eattingBridge: EatingBridge) {
 
   }
 
@@ -220,7 +220,7 @@ export class BattleBridge {
   private async eat() {
     /* It would not restore health when eatting immediately after attacking */
     await sleep(2000);
-    return await this.eattingBridge.eat();
+    return await this.eattingBridge.eatMobile();
   }
 
   private async attackTank(battleId: string, sideId: string) {

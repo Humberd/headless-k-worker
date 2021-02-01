@@ -7,7 +7,7 @@ import { WeeklyChallengeBridge } from './bridges/weekly-challenge-bridge';
 import { RewardCollectorBridge } from './bridges/reward-collector.bridge';
 import { Dispatcher } from './dispatcher/dispatcher';
 import { NaNError, sleep, time } from './utils';
-import { EattingBridge } from './bridges/eatting-bridge';
+import { EatingBridge } from './bridges/eating-bridge';
 import { StateService } from './state.service';
 import { KeepaliveBridge } from './bridges/keepalive-bridge';
 import { BattleAnalyzer } from './battle-algorithm/battle-analyzer';
@@ -46,7 +46,7 @@ const trainBridge = new TrainBridge(networkProxy, stateService);
 const workBridge = new WorkBridge(networkProxy, stateService);
 const weeklyChallengeBridge = new WeeklyChallengeBridge(networkProxy, stateService);
 const rewardCollectorBridge = new RewardCollectorBridge(networkProxy);
-const eattingBridge = new EattingBridge(networkProxy, stateService);
+const eattingBridge = new EatingBridge(networkProxy, stateService);
 const keepaliveBridge = new KeepaliveBridge(networkProxy, stateService);
 const battleBridge = new BattleBridge(networkProxy, stateService, eattingBridge);
 const battleChooser = new BattleChooser(stateService, battleBridge);
@@ -86,12 +86,18 @@ function getJobsDispatcher(): Dispatcher {
       }
     },
     {
-      // Eatting job must always start before attacking job, because it updates health state.
-      id: 'eatting',
+      // Eating job must always start before attacking job, because it updates health state.
+      id: 'eating',
       name: 'Eat',
-      timeInterval: time(7, 'minutes'), // every 7 minutes
+      timeInterval: time(10, 'seconds'), // every 7 minutes
       action: async () => {
-        await eattingBridge.refreshEnergyData();
+        /**
+         * for some fucking weird reason refreshingEnergyData() or eatMobile()
+         * throws 400 when beforehand we fetched list of campaigns from /en/military/campaigns-new/
+         *
+         * WTF?!!
+         */
+        // await eattingBridge.refreshEnergyData();
         await eattingBridge.eat();
         return JobResponse.success();
       },
@@ -208,7 +214,8 @@ function getJobsDispatcher(): Dispatcher {
 
         return false;
       },
-      action: () => battleFighter.tryFight()
+      action: () => battleFighter.tryFight(),
+      afterAction: () => sleep(5000),
     }
   ];
 
