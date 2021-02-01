@@ -10,6 +10,7 @@ import {
   collectDailyTaskReward,
   collectWeeklyChallengeReward,
   eat,
+  eatMobile,
   getBattleStats,
   getCampaignsList,
   getCompaniesPage,
@@ -193,6 +194,10 @@ export class NetworkProxy {
     return this.jsonResponseHandler(eat(this.erpk, this._token));
   }
 
+  async eatMobile() {
+    return this.jsonResponseHandler(eatMobile(this.erpk));
+  }
+
   async getCampainsList() {
     return this.jsonResponseHandler(getCampaignsList(this.erpk));
   }
@@ -338,6 +343,9 @@ export class NetworkProxy {
     try {
       text = await resp.text();
       payload = JSON.parse(text);
+
+      // console.debug(`Response:\n${JSON.stringify(payload, null, 2)}`);
+
     } catch (e) {
       logger.warn(text);
       throw new JsonParsingError(text, e);

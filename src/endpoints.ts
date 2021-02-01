@@ -33,6 +33,7 @@ import { LoginTokenRequest } from './types/login-token-request';
 import { SwitchDivisionRequest } from './types/switch-division-request';
 import { ActivateBattleEffectRequest } from './types/activate-battle-effect-request';
 import { ActivateBattleEffectResponse } from './types/activate-battle-effect-response';
+import { EatMobileResponse } from './types/eat-mobile-response';
 
 interface JsonRequestConfig {
   erpk?: string;
@@ -51,7 +52,7 @@ async function request<T>(url: string, config?: JsonRequestConfig): Promise<Type
     erpk_rm: config.erpk_rm
   });
 
-  const reqestConfig: RequestInit = {
+  const requestConfig: RequestInit = {
     method: config.method || 'GET',
     headers: {
       cookie: cookies,
@@ -62,9 +63,9 @@ async function request<T>(url: string, config?: JsonRequestConfig): Promise<Type
     redirect: 'manual'
   };
 
-  // console.debug(`Request config:\n${JSON.stringify({url, ...reqestConfig}, null, 2)}`);
+  // console.debug(`Request config:\n${JSON.stringify({url, ...requestConfig}, null, 2)}`);
 
-  return fetch(url, reqestConfig);
+  return fetch(url, requestConfig);
 }
 
 function buildCookies(cookiesObj: {[key: string]: string}): string {
@@ -126,6 +127,9 @@ export async function chooseBattleSide(erpk: string, battleId: string, sideId: s
   })
 }
 
+/**
+ * Obsolete eat endpoint
+ */
 export async function eat(erpk: string, _token: string) {
   return request<EatResponse>(`https://www.erepublik.com/en/main/eat?format=json&_token=${_token}&buttonColor=blue`, {
     method: 'POST',
@@ -258,12 +262,23 @@ export async function getMobileUserData(erpk: string) {
   })
 }
 
+/**
+ * There were problems with this request after trying to fight
+ */
 export async function getMobileEnergyData(erpk: string) {
   return request<EnergyDataResponse>('https://www.erepublik.com/en/main/mobile-energy-data', {
     method: 'GET',
     erpk: erpk
   })
 }
+
+export async function eatMobile(erpk: string) {
+  return request<EatMobileResponse>('https://www.erepublik.com/en/main/mobile-energy-eat', {
+    method: 'GET',
+    erpk: erpk
+  })
+}
+
 
 export async function loginCredentialsMobile(formData: LoginCredentialsRequest) {
   return request<UserDataResponse>(`https://www.erepublik.com/en/main/mobile-login`,{
