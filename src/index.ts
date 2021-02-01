@@ -214,8 +214,7 @@ function getJobsDispatcher(): Dispatcher {
 
         return false;
       },
-      action: () => battleFighter.tryFight(),
-      afterAction: () => sleep(5000),
+      action: () => battleFighter.tryFight()
     }
   ];
 
