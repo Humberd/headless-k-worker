@@ -89,7 +89,7 @@ function getJobsDispatcher(): Dispatcher {
       // Eating job must always start before attacking job, because it updates health state.
       id: 'eating',
       name: 'Eat',
-      timeInterval: time(10, 'seconds'), // every 7 minutes
+      timeInterval: time(7, 'minutes'), // every 7 minutes
       action: async () => {
         /**
          * for some fucking weird reason refreshingEnergyData() or eatMobile()
