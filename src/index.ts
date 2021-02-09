@@ -194,29 +194,31 @@ function getJobsDispatcher(): Dispatcher {
       timeInterval: time(1, 'minutes'),
       shouldStopRunning: () => {
         const logger = getLogger('Fight checker');
+        
+        return true;
 
-        const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
-        if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
-          logger.info('Not fighting. Waiting with HP regen to the next day');
-          return true;
-        }
+//         const fullHpRegenTime = stateService.calcTimeToFullSecondaryHp();
+//         if (stateService.dayTimeLeftMs <= fullHpRegenTime) {
+//           logger.info('Not fighting. Waiting with HP regen to the next day');
+//           return true;
+//         }
 
-        // if (!stateService.workedToday() ||
-        //     !stateService.workedOvertimeToday() ||
-        //     !stateService.trainedToday()) {
-        //   logger.info('Not fighting. Some daily tasks has not yet been completed');
-        //   return true;
-        // }
+//         // if (!stateService.workedToday() ||
+//         //     !stateService.workedOvertimeToday() ||
+//         //     !stateService.trainedToday()) {
+//         //   logger.info('Not fighting. Some daily tasks has not yet been completed');
+//         //   return true;
+//         // }
 
-        /* Start attacking 4 hours after wc day start */
-        if (!stateService.workedProductionToday() &&
-            stateService.isWcStartDay() &&
-            !stateService.dayTimeElapsed(time(4, 'hours'))) {
-          logger.info('Not fighting. Production daily task has not yet been completed');
-          return true;
-        }
+//         /* Start attacking 4 hours after wc day start */
+//         if (!stateService.workedProductionToday() &&
+//             stateService.isWcStartDay() &&
+//             !stateService.dayTimeElapsed(time(4, 'hours'))) {
+//           logger.info('Not fighting. Production daily task has not yet been completed');
+//           return true;
+//         }
 
-        return false;
+//         return false;
       },
       action: () => battleFighter.tryFight()
     }
