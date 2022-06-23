@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "jsdom": "^16.4.0",
+    "jsdom": "^16.5.0",
     "log4js": "^6.3.0",
     "node-fetch": "^2.6.1"
   },
